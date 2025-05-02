@@ -6,40 +6,83 @@ Blockchain integration and event processing services
 ```
 vv-chain-services/
 ├── .github/
-│   └── workflows/       # CI/CD pipelines for Azure Functions
+│   └── workflows/                # CI/CD pipelines for Azure Functions and ML Engine
+│       ├── risk-function-ci.yml  # Separate CI/CD for Risk Function App
+│       ├── alert-function-ci.yml # Separate CI/CD for Alert Function App
+│       ├── metrics-function-ci.yml # Separate CI/CD for Metrics Function App
+│       ├── archival-function-ci.yml # Separate CI/CD for Archival Function App
+│       └── ml-engine-ci.yml      # CI/CD for Python ML Engine
 ├── src/
-│   ├── functions/       # Azure Functions
-│   │   ├── RiskBot/     # LTV and TVL calculations
-│   │   │   ├── RiskBotFunction.cs       // Main Azure Function
-│   │   │   ├── RiskApiClient.cs         // Calls Python ML engine
-│   │   │   ├── Models.cs                // Data contracts
-|   │   │   ├── Helpers.cs
+│   ├── function-apps/           # Separated Function Apps for independent scaling/SLAs
+│   │   ├── RiskFunctionApp/     # LTV and TVL calculations
+│   │   │   ├── RiskBotFunction.cs       # Main Azure Function
+│   │   │   ├── RiskApiClient.cs         # Calls Python ML engine
+│   │   │   ├── Models.cs                # Data contracts
+│   │   │   ├── Helpers.cs
+│   │   │   ├── host.json               # Function App host configuration
 │   │   │   └── local.settings.json
-│   │   ├── MetricsBot/  # Prometheus metrics publishing
-│   │   ├── AlertFunc/   # Notification triggers
-│   │   └── ArchivalFunc/# Data storage operations
-│   ├── shared/          # Shared code and utilities
-│   │   ├── models/      # Data models
-│   │   ├── services/    # Service integrations
-│   │   └── utils/       # Helper functions
-│   └── goldsky/         # Goldsky subgraph definitions
-│   │   ├── tezos/       # Tezos-specific subgraphs
-│   │   └── evm/         # EVM-specific subgraphs
-│   └── ml-engine/       # PYTHON
-│   │   ├── app/
-│   │   │   ├── main.py            # FastAPI app
-│   │   │   ├── models/            # ML models (pickle / joblib / ONNX)
-│   │   │   ├── services/          # Risk calculations
-│   │   │   ├── schemas/           # Input/output Pydantic schemas
-│   │   │   └── utils/             # Normalizers, scorers, etc.
-│   │   ├── tests/
-├── requirements.txt
-├── Dockerfile
-└── README.md
-
-├── tests/               # Test suite
-├── README.md            # Repository documentation
-└── package.json         # Dependencies and scripts
+│   │   ├── MetricsFunctionApp/  # OpenTelemetry metrics publishing
+│   │   │   ├── MetricsBotFunction.cs
+│   │   │   ├── TelemetryService.cs
+│   │   │   ├── host.json
+│   │   │   └── local.settings.json
+│   │   ├── AlertFunctionApp/   # Notification triggers
+│   │   │   ├── AlertFunction.cs
+│   │   │   ├── NotificationService.cs
+│   │   │   ├── host.json
+│   │   │   └── local.settings.json
+│   │   └── ArchivalFunctionApp/ # Data storage operations
+│   │       ├── ArchivalFunction.cs
+│   │       ├── StorageService.cs
+│   │       ├── host.json
+│   │       └── local.settings.json
+│   ├── shared/                 # Shared code and utilities
+│   │   ├── models/             # Data models
+│   │   │   ├── EventModels.cs
+│   │   │   └── DomainModels.cs
+│   │   ├── services/           # Service integrations
+│   │   │   ├── CosmosDbService.cs
+│   │   │   ├── RedisService.cs
+│   │   │   └── KeyVaultService.cs
+│   │   └── utils/              # Helper functions
+│   │       ├── EventGridHelpers.cs
+│   │       └── TelemetryHelpers.cs
+│   ├── goldsky/                # Goldsky subgraph definitions
+│   │   ├── tezos/              # Tezos-specific subgraphs
+│   │   │   └── schema.graphql
+│   │   └── evm/                # EVM-specific subgraphs
+│   │       └── schema.graphql
+│   └── ml-engine/              # Python ML Engine (separate deployable unit)
+│       ├── app/
+│       │   ├── main.py         # FastAPI app
+│       │   ├── models/         # ML models (pickle / joblib / ONNX)
+│       │   ├── services/       # Risk calculations
+│       │   ├── schemas/        # Input/output Pydantic schemas
+│       │   └── utils/          # Normalizers, scorers, etc.
+│       ├── tests/              # Python-specific tests
+│       │   ├── test_risk_calculations.py
+│       │   └── test_api.py
+│       ├── requirements.txt    # Python dependencies
+│       ├── Dockerfile          # ML Engine container definition
+│       └── package.json        # Node.js dependencies for ML Engine
+├── infra/                      # Infrastructure as Code
+│   ├── bicep/
+│   │   ├── main.bicep          # Main deployment template
+│   │   ├── eventgrid.bicep     # Event Grid resources
+│   │   ├── functions.bicep     # Function Apps
+│   │   ├── storage.bicep       # Storage resources
+│   │   └── monitoring.bicep    # Monitoring resources
+│   └── scripts/
+│       ├── deploy.ps1          # Deployment scripts
+│       └── setup-goldsky.sh    # Goldsky setup script
+├── tests/                      # C# tests for Azure Functions
+│   ├── RiskFunctionTests/
+│   │   ├── RiskBotFunctionTests.cs
+│   │   └── RiskApiClientTests.cs
+│   ├── MetricsFunctionTests/
+│   ├── AlertFunctionTests/
+│   └── ArchivalFunctionTests/
+└── README.md                   # Repository documentation
 ```
 
 **VeritasVault Event Grid Architecture (Goldsky Integration)**
