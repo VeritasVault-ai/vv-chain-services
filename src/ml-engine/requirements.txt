@@ -1,0 +1,6 @@
+uvicorn~=0.34.2
+numpy~=2.2.5
+pandas~=2.2.3
+yfinance~=0.2.57
+matplotlib~=3.10.1
+pyportfolioopt~=1.5.6
