@@ -27,7 +27,114 @@ vv-chain-services/
 
 **VeritasVault Event Grid Architecture (Goldsky Integration)**
 
----
+flowchart TB
+  subgraph Blockchain["Blockchain Networks"]
+      Tezos["Tezos Network"]
+      EVM["EVM Networks"]
+  end
+  
+  subgraph Goldsky["Goldsky Data Platform"]
+      TezosSubgraph["Tezos Subgraph"]
+      EVMSubgraph["EVM Subgraph"]
+      WebhookOutput["Webhook Output"]
+  end
+  
+  subgraph Azure["Azure Cloud"]
+      EventGrid["Azure Event Grid Topic"]
+      
+      subgraph Functions["Azure Functions"]
+          RiskBot["Risk Bot\n(LTV & TVL Calculations)"]
+          MetricsBot["Metrics Bot\n(Prometheus Push)"]
+          AlertFunction["Alert Function\n(Notifications)"]
+          ArchivalFunction["Archival Function\n(Data Storage)"]
+      end
+      
+      subgraph Storage["Storage & Caching"]
+          CosmosDB["Cosmos DB\n(Long-term Storage)"]
+          Redis["Redis Cache\n(Real-time Data)"]
+          DeadLetter["Dead Letter Storage"]
+      end
+      
+      subgraph Monitoring["Monitoring & Observability"]
+          AppInsights["Application Insights"]
+          LogAnalytics["Log Analytics"]
+          Prometheus["Prometheus\nPushgateway"]
+          SecurityCenter["Security Center"]
+      end
+      
+      subgraph Notifications["Notification Channels"]
+          Teams["Microsoft Teams"]
+          Email["Email"]
+          SMS["SMS"]
+          LogicApp["Logic App\n(Workflow)"]
+      end
+      
+      subgraph Security["Security Components"]
+          KeyVault["Azure Key Vault"]
+          ManagedIdentity["Managed Identities"]
+      end
+  end
+  
+  subgraph Consumers["Data Consumers"]
+      Dashboard["Real-time Dashboard"]
+      GameSuite["DeFi Breakout Game"]
+      RiskEngine["Risk Management Engine"]
+  end
+  
+  %% Connections
+  Tezos --> TezosSubgraph
+  EVM --> EVMSubgraph
+  TezosSubgraph --> WebhookOutput
+  EVMSubgraph --> WebhookOutput
+  WebhookOutput --> EventGrid
+  
+  EventGrid --> RiskBot
+  EventGrid --> MetricsBot
+  EventGrid --> AlertFunction
+  EventGrid --> ArchivalFunction
+  
+  RiskBot --> Redis
+  MetricsBot --> Prometheus
+  AlertFunction --> LogicApp
+  LogicApp --> Teams
+  LogicApp --> Email
+  LogicApp --> SMS
+  ArchivalFunction --> CosmosDB
+  
+  EventGrid -.-> DeadLetter
+  DeadLetter -.-> SecurityCenter
+  
+  Functions --> AppInsights
+  AppInsights --> LogAnalytics
+  
+  Functions --> KeyVault
+  Functions -.-> ManagedIdentity
+  ManagedIdentity --> KeyVault
+  
+  Redis --> Dashboard
+  Redis --> GameSuite
+  Redis --> RiskEngine
+  CosmosDB -.-> Dashboard
+  
+  classDef blockchain fill:#f9f,stroke:#333,stroke-width:2px
+  classDef goldsky fill:#fcf,stroke:#333,stroke-width:1px
+  classDef azure fill:#cdf,stroke:#333,stroke-width:1px
+  classDef function fill:#dfd,stroke:#333,stroke-width:1px
+  classDef storage fill:#ffd,stroke:#333,stroke-width:1px
+  classDef monitoring fill:#dff,stroke:#333,stroke-width:1px
+  classDef notification fill:#fdf,stroke:#333,stroke-width:1px
+  classDef security fill:#fcc,stroke:#333,stroke-width:1px
+  classDef consumer fill:#cfc,stroke:#333,stroke-width:1px
+  
+  class Tezos,EVM blockchain
+  class TezosSubgraph,EVMSubgraph,WebhookOutput goldsky
+  class EventGrid,Functions,Storage,Monitoring,Notifications,Security azure
+  class RiskBot,MetricsBot,AlertFunction,ArchivalFunction function
+  class CosmosDB,Redis,DeadLetter storage
+  class AppInsights,LogAnalytics,Prometheus,SecurityCenter monitoring
+  class Teams,Email,SMS,LogicApp notification
+  class KeyVault,ManagedIdentity security
+  class Dashboard,GameSuite,RiskEngine consumer
 
 ### 📀 Data Flow Overview
 
