@@ -212,12 +212,12 @@ Risk Bot         Metrics Bot         Alert Function      Archival Function
 
 ---
 
-### ♻️ Benefits
-
-- Fully decoupled, scalable event pipeline
-- Multiple independent consumers
-- High resilience with Event Grid retries
-- Goldsky handles chain-to-cloud reliably
-- Cosmos DB replaces the need for Postgres
-- Secure, observable, and DevOps-friendly
+### ♻️ Key Benefits of This Architecture
+#### **Decoupled Processing:**
+Each component operates independently, allowing for flexible scaling and deployment
+High Resilience: Event Grid provides reliable delivery with retries and dead letter queues
+Scalable: Can handle increasing volumes of blockchain events as the platform grows
+Observable: Comprehensive logging and monitoring throughout the pipeline
+Secure: Managed Identities and Key Vault integration for secure secret management
+DevOps-Friendly: Infrastructure as Code (Bicep) for repeatable deployments
 
