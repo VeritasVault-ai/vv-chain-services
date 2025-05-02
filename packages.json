@@ -2,17 +2,21 @@
   "name": "veritasvault-root",
   "private": true,
   "workspaces": [
-    "src/ml-engine",  // Only needed if using workspaces
-    "tests",
-    // add more if applicable
+    "src/ml-engine",
+    "tests"
   ],
   "scripts": {
-    "lint": "eslint . --ext .ts,.js,.py",  // Optional if you want global linting
+    "lint": "eslint . --ext .ts,.js,.py",
     "test": "echo 'Run tests from each subpackage'",
-    "build": "echo 'Trigger CI/CD or infra build scripts'"
+    "build": "echo 'Trigger CI/CD or infra build scripts'",
+    "infra:lint": "cd infra/tests && ./bicep-linter.yml",
+    "infra:whatif": "cd infra/tests && ./whatif-tests.ps1",
+    "goldsky:deploy": "cd src/goldsky && goldsky deploy"
   },
   "devDependencies": {
     "eslint": "^8.56.0",
-    "prettier": "^3.0.0"
+    "prettier": "^3.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0"
   }
 }
