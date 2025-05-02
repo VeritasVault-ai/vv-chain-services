@@ -10,6 +10,7 @@ vv-chain-services/
 ├── src/
 │   ├── functions/       # Azure Functions
 │   │   ├── RiskBot/     # LTV and TVL calculations
+<--- RiskBot could also be python in which case create subolder in src --->
 │   │   ├── MetricsBot/  # Prometheus metrics publishing
 │   │   ├── AlertFunc/   # Notification triggers
 │   │   └── ArchivalFunc/# Data storage operations
