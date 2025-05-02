@@ -14,21 +14,25 @@ msbuild.log
 msbuild.err
 msbuild.wrn
 
-# Visual Studio files
+# Visual Studio / VS Code
 .vs/
 .vscode/
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
+*.userprefs
 
-# Function App local settings
+# Azure Functions
+local.settings.json
 **/local.settings.json
+.python_packages
 
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
 .Python
 env/
 build/
@@ -49,26 +53,29 @@ var/
 .venv
 venv/
 ENV/
+.pytest_cache/
 
 # Node.js
 node_modules/
 npm-debug.log
+yarn-debug.log
 yarn-error.log
 .yarn-integrity
+
+# Docker
+.dockerignore
 
 # IDE specific files
 .idea/
 *.swp
 *.swo
 
-# Azure Functions artifacts
-local.settings.json
-bin/
-obj/
-
 # Bicep
 .bicep-cache/
 
-# Misc
+# OS specific
 .DS_Store
 Thumbs.db
+
+# Redis
+dump.rdb

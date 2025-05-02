@@ -1,25 +1,31 @@
 # vv-chain-services
-Blockchain integration and event processing services
+
+Blockchain integration and event processing services for the VeritasVault.ai platform.
+
+## 🔍 Overview
 
 This repository contains the event-driven microservices responsible for ingesting, processing, analyzing, and archiving blockchain event data from Tezos and EVM networks. It is part of the VeritasVault.ai platform and is tightly integrated with Goldsky, Azure Event Grid, and a distributed risk intelligence engine powered by Python-based ML.
 
 The solution is designed with resilience, observability, and modularity in mind — allowing independent teams to scale risk models, extend observability, or hook in new event sources with minimal friction.
 
 ## 📚 Table of Contents
+
 - [🔧 Chain and Services Architecture](#-chain-and-services-architecture)
-- [🔧 Repository Structure](#-repository-structure)
+- [🏗️ Development Environment](#-development-environment)
+- [📂 Repository Structure](#-repository-structure)
 - [📀 Data Flow Overview](#-data-flow-overview)
+- [⚙️ Running the Project Locally](#-running-the-project-locally)
 - [⚖️ Azure Components](#-azure-components)
 - [🎓 Use Case Handlers](#-use-case-handlers)
+- [🚀 Deployment](#-deployment)
+- [🧪 Testing](#-testing)
 - [🔨 Goldsky Setup Notes](#-goldsky-setup-notes)
 - [🌐 Security & Observability](#-security--observability)
-- [♻️ Benefits](#-benefits)
+- [♻️ Benefits](#-benefits-of-this-architecture)
+- [📝 Documentation](#-documentation)
+- [👥 Contributing](#-contributing)
 
-```text
-
-```
-
-## Chain and Services Architecture
+## 🔧 Chain and Services Architecture
 
 ```mermaid
 flowchart TB
@@ -91,124 +97,46 @@ flowchart TB
   
   LogAnalytics --> Dashboards
   AppInsights --> Dashboards
-  
-  classDef blockchain fill:#f9f,stroke:#333,stroke-width:2px
-  classDef goldsky fill:#ffc,stroke:#333,stroke-width:2px
-  classDef azure fill:#cef,stroke:#333,stroke-width:2px
-  classDef function fill:#cfc,stroke:#333,stroke-width:2px
-  classDef ml fill:#fcf,stroke:#333,stroke-width:2px
-  classDef storage fill:#fcc,stroke:#333,stroke-width:2px
-  classDef monitoring fill:#ccf,stroke:#333,stroke-width:2px
-  classDef notification fill:#cff,stroke:#333,stroke-width:2px
-  
-  class Tezos,EVM blockchain
-  class GoldskyTezos,GoldskyEVM goldsky
-  class EventGrid azure
-  class RiskBot,MetricsBot,AlertBot,ArchivalBot function
-  class APIGateway,MLEngine ml
-  class CosmosDB,Redis storage
-  class LogAnalytics,AppInsights,Dashboards monitoring
-  class Teams,Email,SMS notification
 ```
 
-## 🔧 Repository Structure
+## 🏗️ Development Environment
+
+This project uses Visual Studio Code Dev Containers for a consistent development experience.
+
+### Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop)
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [Remote - Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
+
+### Getting Started
+
+1. Clone the repository
+2. Open the project in VS Code
+3. When prompted, click "Reopen in Container" or run the "Remote-Containers: Reopen in Container" command
+4. The container will build and set up the development environment
+
+For more detailed information about the workspace configuration, see [WORKSPACE.md](WORKSPACE.md).
+
+## 📂 Repository Structure
+
+This repository follows a modular structure to support independent development and deployment of components:
 
 ```
-vv-iac/                                # Separate repo - Infrastructure as Code
-├── .github/
-│   └── workflows/                     # CI/CD pipelines for Azure Functions and ML Engine
-│       ├── risk-function-ci.yml       # Separate CI/CD for Risk Function App
-│       ├── alert-function-ci.yml      # Separate CI/CD for Alert Function App
-│       ├── metrics-function-ci.yml    # Separate CI/CD for Metrics Function App
-│       ├── archival-function-ci.yml   # Separate CI/CD for Archival Function App
-│       └── ml-engine-ci.yml           # CI/CD for Python ML Engine
-├── infra/                      
-│   ├── bicep/
-│   │   ├── main.bicep                # Main deployment template
-│   │   ├── eventgrid.bicep           # Event Grid resources
-│   │   ├── functions.bicep           # Function Apps
-│   │   ├── storage.bicep             # Storage resources
-│   │   ├── monitoring.bicep          # Monitoring resources
-│   │   ├── api-gateway.bicep         # New: API Gateway for ML Engine isolation
-│   │   └── ml-engine.bicep           # New: Separate ML Engine infrastructure
-│   └── scripts/
-│       ├── deploy.ps1                # Deployment scripts
-│       └── setup-goldsky.sh          # Goldsky setup script
-├── tests/                            # New: Infrastructure tests
-├── bicep-linter.yml                  # Bicep linting configuration
-      └── whatif-tests.ps1            # WhatIf tests for infrastructure changes
-
-
 vv-chain-services/
-|__ .github/                          # NOTE: Created througgh IAC repo and scripted here -  consolidates our piepelines 
-├── .gitignore                        # Ensure local.settings.json is excluded
-├── package.json                      # Root package.json for workspace management
-├── docs                              # NOTE: Created through our docs repo, duplicated here for ease of reference
 ├── src/
-│   ├── function-apps/                # Separated Function Apps for independent scaling/SLAs
-│   │   ├── RiskBotApp/               # Renamed from RiskFunctionApp to align with internal naming
-│   │   │   ├── RiskBotFunction.cs    # Main Azure Function
-│   │   │   ├── RiskApiClient.cs      # Calls Python ML engine
-│   │   │   ├── Models.cs             # Data contracts
-│   │   │   ├── Helpers.cs
-│   │   │   ├── host.json             # Function App host configuration
-│   │   │   └── local.settings.json   # Will be excluded via .gitignore
-│   │   ├── MetricsFunctionApp/       # OpenTelemetry metrics publishing
-│   │   │   ├── MetricsBotFunction.cs
-│   │   │   ├── TelemetryService.cs
-│   │   │   ├── host.json
-│   │   │   └── local.settings.json   # Will be excluded via .gitignore
-│   │   ├── AlertFunctionApp/         # Notification triggers
-│   │   │   ├── AlertFunction.cs
-│   │   │   ├── NotificationService.cs
-│   │   │   ├── host.json
-│   │   │   └── local.settings.json  # Will be excluded via .gitignore
-│   │   └── ArchivalFunctionApp/     # Data storage operations
-│   │       ├── ArchivalFunction.cs
-│   │       ├── StorageService.cs
-│   │       ├── host.json
-│   │       └── local.settings.json  # Will be excluded via .gitignore
-│   ├── shared/                      # Shared code and utilities
-│   │   ├── models/                  # Data models
-│   │   │   ├── EventModels.cs
-│   │   │   └── DomainModels.cs
-│   │   ├── services/                # Service integrations
-│   │   │   ├── CosmosDbService.cs
-│   │   │   ├── RedisService.cs
-│   │   │   └── KeyVaultService.cs
-│   │   └── utils/                   # Helper functions
-│   │       ├── EventGridHelpers.cs
-│   │       └── TelemetryHelpers.cs
-│   ├── goldsky/                    # Goldsky subgraph definitions
-│   │   ├── .goldsky-version        # Track Goldsky CLI version used
-│   │   ├── subgraph.config.yml     # Configuration for multiple GraphQL schemas
-│   │   ├── tezos/                  # Tezos-specific subgraphs
-│   │   │   └── schema.graphql
-│   │   └── evm/                    # EVM-specific subgraphs
-│   │       └── schema.graphql
-│   └── ml-engine/                  # Python ML Engine (separate deployable unit)
-│       ├── app/
-│       │   ├── main.py             # FastAPI app
-│       │   ├── models/             # ML models (pickle / joblib / ONNX)
-│       │   ├── services/           # Risk calculations
-│       │   ├── schemas/            # Input/output Pydantic schemas
-│       │   └── utils/              # Normalizers, scorers, etc.
-│       ├── tests/                  # Python-specific tests
-│       │   ├── test_risk_calculations.py
-│       │   └── test_api.py
-│       ├── requirements.txt        # Python dependencies
-│       ├── Dockerfile              # ML Engine container definition
-│       └── package.json            # Node.js dependencies for ML Engine
-├── tests/                          # C# tests for Azure Functions
-│   ├── RiskBotTests/
-│   │   ├── RiskBotFunctionTests.cs
-│   │   └── RiskApiClientTests.cs
-│   ├── MetricsFunctionTests/
-│   ├── AlertFunctionTests/
-│   └── ArchivalFunctionTests/
-└── README.md                       # Repository documentation
-
+│   ├── function-apps/           # Separated Function Apps for independent scaling/SLAs
+│   │   ├── RiskBotApp/          # Risk calculation and ML integration
+│   │   ├── MetricsFunctionApp/  # OpenTelemetry metrics publishing
+│   │   ├── AlertFunctionApp/    # Notification triggers
+│   │   └── ArchivalFunctionApp/ # Data storage operations
+│   ├── shared/                  # Shared code and utilities
+│   ├── goldsky/                 # Goldsky subgraph definitions
+│   └── ml-engine/               # Python ML Engine (separate deployable unit)
+└── tests/                       # C# tests for Azure Functions
 ```
+
+For a complete folder structure with detailed explanations, see [FOLDER-STRUCTURE.md](FOLDER-STRUCTURE.md).
 
 ## 📀 Data Flow Overview
 
@@ -227,6 +155,31 @@ Azure Event Grid Topic
 Risk Bot         Metrics Bot         Alert Function      Archival Function
 (Estimates, LTV) (OpenTelemetry)     (Notify, Email)     (Store to Cosmos DB)
 ```
+
+## ⚙️ Running the Project Locally
+
+### Start the ML Engine
+
+```bash
+cd src/ml-engine
+uvicorn app.main:app --reload --port 8000
+```
+
+### Start the Azure Functions
+
+```bash
+# Start Risk Bot App
+cd src/function-apps/RiskBotApp
+func start
+
+# Start other function apps similarly
+```
+
+Alternatively, you can use the VS Code tasks defined in the workspace:
+
+1. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on macOS)
+2. Type "Tasks: Run Task" and select it
+3. Choose "Start Full Stack" to run both the ML Engine and Azure Functions
 
 ## ⚖️ Azure Components
 
@@ -263,6 +216,40 @@ Risk Bot         Metrics Bot         Alert Function      Archival Function
 - Batches and stores full JSON payloads
 - Writes to Cosmos DB with TTL
 - Manages data partitioning and indexing
+
+## 🚀 Deployment
+
+### Azure Functions
+
+```bash
+cd src/function-apps/RiskBotApp
+func azure functionapp publish <function-app-name>
+```
+
+### ML Engine
+
+The ML Engine can be deployed as a container to Azure Container Apps, Azure Kubernetes Service, or Azure App Service.
+
+```bash
+cd src/ml-engine
+az acr build --registry <acr-name> --image ml-engine:latest .
+```
+
+## 🧪 Testing
+
+### .NET Tests
+
+```bash
+cd tests/RiskBotTests
+dotnet test
+```
+
+### Python Tests
+
+```bash
+cd src/ml-engine
+pytest
+```
 
 ## 🔨 Goldsky Setup Notes
 
@@ -303,3 +290,15 @@ Infrastructure as Code (Bicep) for repeatable deployments
 
 #### **Independent Scaling:**
 Each Function App can scale based on its specific workload and requirements
+
+## 📝 Documentation
+
+Additional documentation is available in the following files:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Guidelines for contributing to the project
+- [WORKSPACE.md](WORKSPACE.md) - VS Code workspace configuration and usage
+- [FOLDER-STRUCTURE.md](FOLDER-STRUCTURE.md) - Detailed explanation of the repository structure
+
+## 👥 Contributing
+
+We welcome contributions to the vv-chain-services project! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.

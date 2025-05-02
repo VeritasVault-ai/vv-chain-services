@@ -37,6 +37,100 @@ vv-iac/
 
 ## Core Components
 
+
+## Chain and Services Architecture
+
+```mermaid
+flowchart TB
+  subgraph "Blockchain Networks"
+    Tezos["Tezos Network"]
+    EVM["EVM Networks"]
+  end
+
+  subgraph "Data Ingestion"
+    GoldskyTezos["Goldsky Tezos Subgraph"]
+    GoldskyEVM["Goldsky EVM Subgraph"]
+  end
+
+  subgraph "Event Distribution"
+    EventGrid["Azure Event Grid Topic"]
+  end
+
+  subgraph "Function Apps"
+    RiskBot["Risk Bot App\n(LTV & Risk Calculations)"]
+    MetricsBot["Metrics Function App\n(OpenTelemetry)"]
+    AlertBot["Alert Function App\n(Notifications)"]
+    ArchivalBot["Archival Function App\n(Data Storage)"]
+  end
+
+  subgraph "ML Layer"
+    APIGateway["API Gateway\n(Security & Rate Limiting)"]
+    MLEngine["ML Engine\n(Python Risk Models)"]
+  end
+
+  subgraph "Storage & Caching"
+    CosmosDB["Cosmos DB\n(Event Archival)"]
+    Redis["Redis Cache\n(Real-time Data)"]
+  end
+
+  subgraph "Monitoring & Observability"
+    LogAnalytics["Log Analytics"]
+    AppInsights["Application Insights"]
+    Dashboards["Azure Dashboards"]
+  end
+
+  subgraph "Notifications"
+    Teams["Microsoft Teams"]
+    Email["Email"]
+    SMS["SMS"]
+  end
+
+  Tezos --> GoldskyTezos
+  EVM --> GoldskyEVM
+  GoldskyTezos --> EventGrid
+  GoldskyEVM --> EventGrid
+  
+  EventGrid --> RiskBot
+  EventGrid --> MetricsBot
+  EventGrid --> AlertBot
+  EventGrid --> ArchivalBot
+  
+  RiskBot --> APIGateway
+  APIGateway --> MLEngine
+  RiskBot --> Redis
+  
+  MetricsBot --> LogAnalytics
+  MetricsBot --> AppInsights
+  
+  AlertBot --> Teams
+  AlertBot --> Email
+  AlertBot --> SMS
+  
+  ArchivalBot --> CosmosDB
+  
+  LogAnalytics --> Dashboards
+  AppInsights --> Dashboards
+  
+  classDef blockchain fill:#f9f,stroke:#333,stroke-width:2px
+  classDef goldsky fill:#ffc,stroke:#333,stroke-width:2px
+  classDef azure fill:#cef,stroke:#333,stroke-width:2px
+  classDef function fill:#cfc,stroke:#333,stroke-width:2px
+  classDef ml fill:#fcf,stroke:#333,stroke-width:2px
+  classDef storage fill:#fcc,stroke:#333,stroke-width:2px
+  classDef monitoring fill:#ccf,stroke:#333,stroke-width:2px
+  classDef notification fill:#cff,stroke:#333,stroke-width:2px
+  
+  class Tezos,EVM blockchain
+  class GoldskyTezos,GoldskyEVM goldsky
+  class EventGrid azure
+  class RiskBot,MetricsBot,AlertBot,ArchivalBot function
+  class APIGateway,MLEngine ml
+  class CosmosDB,Redis storage
+  class LogAnalytics,AppInsights,Dashboards monitoring
+  class Teams,Email,SMS notification
+```
+
+
 ### 1. Data Ingestion Layer
 
 - **Goldsky Subgraphs**: Index and transform blockchain events
