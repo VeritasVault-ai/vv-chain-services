@@ -10,7 +10,11 @@ vv-chain-services/
 ├── src/
 │   ├── functions/       # Azure Functions
 │   │   ├── RiskBot/     # LTV and TVL calculations
-<--- RiskBot could also be python in which case create subolder in src --->
+│   │   │   ├── RiskBotFunction.cs       // Main Azure Function
+│   │   │   ├── RiskApiClient.cs         // Calls Python ML engine
+│   │   │   ├── Models.cs                // Data contracts
+|   │   │   ├── Helpers.cs
+│   │   │   └── local.settings.json
 │   │   ├── MetricsBot/  # Prometheus metrics publishing
 │   │   ├── AlertFunc/   # Notification triggers
 │   │   └── ArchivalFunc/# Data storage operations
@@ -19,8 +23,20 @@ vv-chain-services/
 │   │   ├── services/    # Service integrations
 │   │   └── utils/       # Helper functions
 │   └── goldsky/         # Goldsky subgraph definitions
-│       ├── tezos/       # Tezos-specific subgraphs
-│       └── evm/         # EVM-specific subgraphs
+│   │   ├── tezos/       # Tezos-specific subgraphs
+│   │   └── evm/         # EVM-specific subgraphs
+│   └── ml-engine/       # PYTHON
+│   │   ├── app/
+│   │   │   ├── main.py            # FastAPI app
+│   │   │   ├── models/            # ML models (pickle / joblib / ONNX)
+│   │   │   ├── services/          # Risk calculations
+│   │   │   ├── schemas/           # Input/output Pydantic schemas
+│   │   │   └── utils/             # Normalizers, scorers, etc.
+│   │   ├── tests/
+├── requirements.txt
+├── Dockerfile
+└── README.md
+
 ├── tests/               # Test suite
 ├── README.md            # Repository documentation
 └── package.json         # Dependencies and scripts
