@@ -1,10 +1,7 @@
-# vv-chain-services
-VeritasVault.ai vv-chain-services
+# 4. vv-chain-services
+Blockchain integration and event processing services
 
 ## Repo structure
-
-### 4. vv-chain-services
-Blockchain integration and event processing services
 
 ```
 vv-chain-services/
