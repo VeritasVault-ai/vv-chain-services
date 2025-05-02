@@ -1,0 +1,76 @@
+# subgraph.config.yml
+specVersion: 0.0.1
+description: VeritasVault blockchain event tracking
+repository: https://github.com/veritasvault/vv-chain-services
+schema:
+  file: ./schema.graphql
+
+dataSources:
+  - kind: tezos
+    name: tezos-vault-contracts
+    network: mainnet
+    source:
+      address: KT1...  # Contract address
+    mapping:
+      kind: tezos/graph-ts
+      apiVersion: 0.1.0
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+        - Transaction
+        - PriceUpdate
+      abis:
+        - name: VaultContract
+          file: ./abis/VaultContract.json
+      eventHandlers:
+        - event: deposit(address indexed from, uint256 amount)
+          handler: handleDeposit
+        - event: withdrawal(address indexed to, uint256 amount)
+          handler: handleWithdrawal
+        - event: priceUpdate(string asset, uint256 price)
+          handler: handlePriceUpdate
+      file: ./src/tezos-mapping.ts
+
+  - kind: ethereum
+    name: evm-vault-contracts
+    network: ethereum
+    source:
+      address: "0x..."  # Contract address
+      abi: VaultContract
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+        - Transaction
+        - PriceUpdate
+      abis:
+        - name: VaultContract
+          file: ./abis/VaultContract.json
+      eventHandlers:
+        - event: Deposit(indexed address,uint256)
+          handler: handleDeposit
+        - event: Withdrawal(indexed address,uint256)
+          handler: handleWithdrawal
+        - event: PriceUpdate(string,uint256)
+          handler: handlePriceUpdate
+      file: ./src/evm-mapping.ts
+
+templates:
+  - name: webhook-output
+    kind: webhook
+    target:
+      url: https://veritasvault-eventgrid.azure-api.net/api/events
+      headers:
+        Content-Type: application/json
+        x-api-key: ${WEBHOOK_API_KEY}
+    trigger:
+      type: entities
+      entities:
+        - PriceUpdate
+        - Transaction
+    retry:
+      attempts: 5
+      backoff: exponential
+      initialDelay: 1000
