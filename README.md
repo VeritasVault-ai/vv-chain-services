@@ -27,6 +27,7 @@ vv-chain-services/
 
 **VeritasVault Event Grid Architecture (Goldsky Integration)**
 
+``` mermaid
 flowchart TB
   subgraph Blockchain["Blockchain Networks"]
       Tezos["Tezos Network"]
@@ -135,6 +136,7 @@ flowchart TB
   class Teams,Email,SMS,LogicApp notification
   class KeyVault,ManagedIdentity security
   class Dashboard,GameSuite,RiskEngine consumer
+```
 
 ### 📀 Data Flow Overview
 
