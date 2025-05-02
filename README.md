@@ -23,115 +23,92 @@ The solution is designed with resilience, observability, and modularity in mind 
 
 ```mermaid
 flowchart TB
-  subgraph Blockchain["Blockchain Networks"]
-      Tezos["Tezos Network"]
-      EVM["EVM Networks"]
+  subgraph "Blockchain Networks"
+    Tezos["Tezos Network"]
+    EVM["EVM Networks"]
   end
-  
-  subgraph Goldsky["Goldsky Data Platform"]
-      TezosSubgraph["Tezos Subgraph"]
-      EVMSubgraph["EVM Subgraph"]
-      WebhookOutput["Webhook Output"]
+
+  subgraph "Data Ingestion"
+    GoldskyTezos["Goldsky Tezos Subgraph"]
+    GoldskyEVM["Goldsky EVM Subgraph"]
   end
-  
-  subgraph Azure["Azure Cloud"]
-      EventGrid["Azure Event Grid Topic"]
-      
-      subgraph Functions["Azure Functions"]
-          RiskBot["Risk Bot\n(LTV & TVL Calculations)"]
-          MetricsBot["Metrics Bot\n(Prometheus Push)"]
-          AlertFunction["Alert Function\n(Notifications)"]
-          ArchivalFunction["Archival Function\n(Data Storage)"]
-      end
-      
-      subgraph Storage["Storage & Caching"]
-          CosmosDB["Cosmos DB\n(Long-term Storage)"]
-          Redis["Redis Cache\n(Real-time Data)"]
-          DeadLetter["Dead Letter Storage"]
-      end
-      
-      subgraph Monitoring["Monitoring & Observability"]
-          AppInsights["Application Insights"]
-          LogAnalytics["Log Analytics"]
-          OpenTelemetry["OpenTelemetry\nCollector"]
-          SecurityCenter["Security Center"]
-      end
-      
-      subgraph Notifications["Notification Channels"]
-          Teams["Microsoft Teams"]
-          Email["Email"]
-          SMS["SMS"]
-          LogicApp["Logic App\n(Workflow)"]
-      end
-      
-      subgraph Security["Security Components"]
-          KeyVault["Azure Key Vault"]
-          ManagedIdentity["Managed Identities"]
-      end
+
+  subgraph "Event Distribution"
+    EventGrid["Azure Event Grid Topic"]
   end
-  
-  subgraph Consumers["Data Consumers"]
-      Dashboard["Real-time Dashboard"]
-      GameSuite["DeFi Breakout Game"]
-      RiskEngine["Risk Management Engine"]
+
+  subgraph "Function Apps"
+    RiskBot["Risk Bot App\n(LTV & Risk Calculations)"]
+    MetricsBot["Metrics Function App\n(OpenTelemetry)"]
+    AlertBot["Alert Function App\n(Notifications)"]
+    ArchivalBot["Archival Function App\n(Data Storage)"]
   end
-  
-  %% Connections
-  Tezos --> TezosSubgraph
-  EVM --> EVMSubgraph
-  TezosSubgraph --> WebhookOutput
-  EVMSubgraph --> WebhookOutput
-  WebhookOutput --> EventGrid
+
+  subgraph "ML Layer"
+    APIGateway["API Gateway\n(Security & Rate Limiting)"]
+    MLEngine["ML Engine\n(Python Risk Models)"]
+  end
+
+  subgraph "Storage & Caching"
+    CosmosDB["Cosmos DB\n(Event Archival)"]
+    Redis["Redis Cache\n(Real-time Data)"]
+  end
+
+  subgraph "Monitoring & Observability"
+    LogAnalytics["Log Analytics"]
+    AppInsights["Application Insights"]
+    Dashboards["Azure Dashboards"]
+  end
+
+  subgraph "Notifications"
+    Teams["Microsoft Teams"]
+    Email["Email"]
+    SMS["SMS"]
+  end
+
+  Tezos --> GoldskyTezos
+  EVM --> GoldskyEVM
+  GoldskyTezos --> EventGrid
+  GoldskyEVM --> EventGrid
   
   EventGrid --> RiskBot
   EventGrid --> MetricsBot
-  EventGrid --> AlertFunction
-  EventGrid --> ArchivalFunction
+  EventGrid --> AlertBot
+  EventGrid --> ArchivalBot
   
+  RiskBot --> APIGateway
+  APIGateway --> MLEngine
   RiskBot --> Redis
-  RiskBot --> OpenTelemetry
-  MetricsBot --> OpenTelemetry
-  AlertFunction --> LogicApp
-  LogicApp --> Teams
-  LogicApp --> Email
-  LogicApp --> SMS
-  ArchivalFunction --> CosmosDB
   
-  EventGrid -.-> DeadLetter
-  DeadLetter -.-> SecurityCenter
+  MetricsBot --> LogAnalytics
+  MetricsBot --> AppInsights
   
-  Functions --> AppInsights
-  AppInsights --> LogAnalytics
-  OpenTelemetry --> LogAnalytics
+  AlertBot --> Teams
+  AlertBot --> Email
+  AlertBot --> SMS
   
-  Functions --> KeyVault
-  Functions -.-> ManagedIdentity
-  ManagedIdentity --> KeyVault
+  ArchivalBot --> CosmosDB
   
-  Redis --> Dashboard
-  Redis --> GameSuite
-  Redis --> RiskEngine
-  CosmosDB -.-> Dashboard
+  LogAnalytics --> Dashboards
+  AppInsights --> Dashboards
   
-  classDef blockchain fill:#d1c4e9,stroke:#5e35b1,stroke-width:2px,color:#1a237e
-  classDef goldsky   fill:#f8bbd0,stroke:#c2185b,stroke-width:1px,color:#880e4f
-  classDef azure     fill:#bbdefb,stroke:#1976d2,stroke-width:1px,color:#0d47a1
-  classDef function  fill:#c8e6c9,stroke:#388e3c,stroke-width:1px,color:#1b5e20
-  classDef storage   fill:#fff9c4,stroke:#fbc02d,stroke-width:1px,color:#f57f17
-  classDef monitoring fill:#b2ebf2,stroke:#00acc1,stroke-width:1px,color:#006064
-  classDef notification fill:#f3e5f5,stroke:#8e24aa,stroke-width:1px,color:#4a148c
-  classDef security  fill:#ffcdd2,stroke:#e53935,stroke-width:1px,color:#b71c1c
-  classDef consumer  fill:#dcedc8,stroke:#7cb342,stroke-width:1px,color:#33691e
+  classDef blockchain fill:#f9f,stroke:#333,stroke-width:2px
+  classDef goldsky fill:#ffc,stroke:#333,stroke-width:2px
+  classDef azure fill:#cef,stroke:#333,stroke-width:2px
+  classDef function fill:#cfc,stroke:#333,stroke-width:2px
+  classDef ml fill:#fcf,stroke:#333,stroke-width:2px
+  classDef storage fill:#fcc,stroke:#333,stroke-width:2px
+  classDef monitoring fill:#ccf,stroke:#333,stroke-width:2px
+  classDef notification fill:#cff,stroke:#333,stroke-width:2px
   
   class Tezos,EVM blockchain
-  class TezosSubgraph,EVMSubgraph,WebhookOutput goldsky
+  class GoldskyTezos,GoldskyEVM goldsky
   class EventGrid azure
-  class RiskBot,MetricsBot,AlertFunction,ArchivalFunction function
-  class CosmosDB,Redis,DeadLetter storage
-  class AppInsights,LogAnalytics,OpenTelemetry,SecurityCenter monitoring
-  class Teams,Email,SMS,LogicApp notification
-  class KeyVault,ManagedIdentity security
-  class Dashboard,GameSuite,RiskEngine consumer
+  class RiskBot,MetricsBot,AlertBot,ArchivalBot function
+  class APIGateway,MLEngine ml
+  class CosmosDB,Redis storage
+  class LogAnalytics,AppInsights,Dashboards monitoring
+  class Teams,Email,SMS notification
 ```
 
 ## 🔧 Repository Structure
