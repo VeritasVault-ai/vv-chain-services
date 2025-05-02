@@ -1,0 +1,18 @@
+{
+  "name": "veritasvault-root",
+  "private": true,
+  "workspaces": [
+    "src/ml-engine",  // Only needed if using workspaces
+    "tests",
+    // add more if applicable
+  ],
+  "scripts": {
+    "lint": "eslint . --ext .ts,.js,.py",  // Optional if you want global linting
+    "test": "echo 'Run tests from each subpackage'",
+    "build": "echo 'Trigger CI/CD or infra build scripts'"
+  },
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "prettier": "^3.0.0"
+  }
+}
