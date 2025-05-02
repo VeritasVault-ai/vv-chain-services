@@ -17,6 +17,7 @@ The solution is designed with resilience, observability, and modularity in mind 
 
 ## Chain and Services Architecture
 
+```mermaid
 flowchart TB
   subgraph Blockchain["Blockchain Networks"]
       Tezos["Tezos Network"]
