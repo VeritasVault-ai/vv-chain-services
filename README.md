@@ -15,6 +15,10 @@ The solution is designed with resilience, observability, and modularity in mind 
 - [🌐 Security & Observability](#-security--observability)
 - [♻️ Benefits](#-benefits)
 
+```text
+
+```
+
 ## Chain and Services Architecture
 
 ```mermaid
@@ -133,38 +137,58 @@ flowchart TB
 ## 🔧 Repository Structure
 
 ```
-vv-chain-services/
+vv-iac/                                # Separate repo - Infrastructure as Code
 ├── .github/
-│   └── workflows/                # CI/CD pipelines for Azure Functions and ML Engine
-│       ├── risk-function-ci.yml  # Separate CI/CD for Risk Function App
-│       ├── alert-function-ci.yml # Separate CI/CD for Alert Function App
-│       ├── metrics-function-ci.yml # Separate CI/CD for Metrics Function App
-│       ├── archival-function-ci.yml # Separate CI/CD for Archival Function App
-│       └── ml-engine-ci.yml      # CI/CD for Python ML Engine
+│   └── workflows/                     # CI/CD pipelines for Azure Functions and ML Engine
+│       ├── risk-function-ci.yml       # Separate CI/CD for Risk Function App
+│       ├── alert-function-ci.yml      # Separate CI/CD for Alert Function App
+│       ├── metrics-function-ci.yml    # Separate CI/CD for Metrics Function App
+│       ├── archival-function-ci.yml   # Separate CI/CD for Archival Function App
+│       └── ml-engine-ci.yml           # CI/CD for Python ML Engine
+├── infra/                      
+│   ├── bicep/
+│   │   ├── main.bicep                # Main deployment template
+│   │   ├── eventgrid.bicep           # Event Grid resources
+│   │   ├── functions.bicep           # Function Apps
+│   │   ├── storage.bicep             # Storage resources
+│   │   ├── monitoring.bicep          # Monitoring resources
+│   │   ├── api-gateway.bicep         # New: API Gateway for ML Engine isolation
+│   │   └── ml-engine.bicep           # New: Separate ML Engine infrastructure
+│   └── scripts/
+│       ├── deploy.ps1                # Deployment scripts
+│       └── setup-goldsky.sh          # Goldsky setup script
+├── tests/                            # New: Infrastructure tests
+├── bicep-linter.yml                  # Bicep linting configuration
+      └── whatif-tests.ps1            # WhatIf tests for infrastructure changes
+
+
+vv-chain-services/
+├── .gitignore                    # Ensure local.settings.json is excluded
+├── package.json                  # Root package.json for workspace management
 ├── src/
-│   ├── function-apps/           # Separated Function Apps for independent scaling/SLAs
-│   │   ├── RiskFunctionApp/     # LTV and TVL calculations
+│   ├── function-apps/               # Separated Function Apps for independent scaling/SLAs
+│   │   ├── RiskBotApp/              # Renamed from RiskFunctionApp to align with internal naming
 │   │   │   ├── RiskBotFunction.cs       # Main Azure Function
 │   │   │   ├── RiskApiClient.cs         # Calls Python ML engine
 │   │   │   ├── Models.cs                # Data contracts
 │   │   │   ├── Helpers.cs
 │   │   │   ├── host.json               # Function App host configuration
-│   │   │   └── local.settings.json
+│   │   │   └── local.settings.json  # Will be excluded via .gitignore
 │   │   ├── MetricsFunctionApp/  # OpenTelemetry metrics publishing
 │   │   │   ├── MetricsBotFunction.cs
 │   │   │   ├── TelemetryService.cs
 │   │   │   ├── host.json
-│   │   │   └── local.settings.json
+│   │   │   └── local.settings.json  # Will be excluded via .gitignore
 │   │   ├── AlertFunctionApp/   # Notification triggers
 │   │   │   ├── AlertFunction.cs
 │   │   │   ├── NotificationService.cs
 │   │   │   ├── host.json
-│   │   │   └── local.settings.json
+│   │   │   └── local.settings.json  # Will be excluded via .gitignore
 │   │   └── ArchivalFunctionApp/ # Data storage operations
 │   │       ├── ArchivalFunction.cs
 │   │       ├── StorageService.cs
 │   │       ├── host.json
-│   │       └── local.settings.json
+│   │       └── local.settings.json  # Will be excluded via .gitignore
 │   ├── shared/                 # Shared code and utilities
 │   │   ├── models/             # Data models
 │   │   │   ├── EventModels.cs
@@ -177,6 +201,8 @@ vv-chain-services/
 │   │       ├── EventGridHelpers.cs
 │   │       └── TelemetryHelpers.cs
 │   ├── goldsky/                # Goldsky subgraph definitions
+│   │   ├── .goldsky-version      # Track Goldsky CLI version used
+│   │   ├── subgraph.config.yml   # Configuration for multiple GraphQL schemas
 │   │   ├── tezos/              # Tezos-specific subgraphs
 │   │   │   └── schema.graphql
 │   │   └── evm/                # EVM-specific subgraphs
@@ -194,24 +220,13 @@ vv-chain-services/
 │       ├── requirements.txt    # Python dependencies
 │       ├── Dockerfile          # ML Engine container definition
 │       └── package.json        # Node.js dependencies for ML Engine
-├── infra/                      # Infrastructure as Code
-│   ├── bicep/
-│   │   ├── main.bicep          # Main deployment template
-│   │   ├── eventgrid.bicep     # Event Grid resources
-│   │   ├── functions.bicep     # Function Apps
-│   │   ├── storage.bicep       # Storage resources
-│   │   └── monitoring.bicep    # Monitoring resources
-│   └── scripts/
-│       ├── deploy.ps1          # Deployment scripts
-│       └── setup-goldsky.sh    # Goldsky setup script
 ├── tests/                      # C# tests for Azure Functions
-│   ├── RiskFunctionTests/
+│   ├── RiskBotTests/
 │   │   ├── RiskBotFunctionTests.cs
 │   │   └── RiskApiClientTests.cs
 │   ├── MetricsFunctionTests/
 │   ├── AlertFunctionTests/
 │   └── ArchivalFunctionTests/
-├── package.json        # Node.js dependencies for ML Engine
 └── README.md                   # Repository documentation
 
 ```
