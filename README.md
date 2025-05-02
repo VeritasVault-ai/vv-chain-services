@@ -215,9 +215,14 @@ Risk Bot         Metrics Bot         Alert Function      Archival Function
 ### ♻️ Key Benefits of This Architecture
 #### **Decoupled Processing:**
 Each component operates independently, allowing for flexible scaling and deployment
-High Resilience: Event Grid provides reliable delivery with retries and dead letter queues
-Scalable: Can handle increasing volumes of blockchain events as the platform grows
-Observable: Comprehensive logging and monitoring throughout the pipeline
-Secure: Managed Identities and Key Vault integration for secure secret management
-DevOps-Friendly: Infrastructure as Code (Bicep) for repeatable deployments
+#### **High Resilience:**
+Event Grid provides reliable delivery with retries and dead letter queues
+#### **Scalable:**
+Can handle increasing volumes of blockchain events as the platform grows
+#### **Observable:**
+Comprehensive logging and monitoring throughout the pipeline
+#### **Secure:**
+Managed Identities and Key Vault integration for secure secret management
+#### **DevOps-Friendly:**
+Infrastructure as Code (Bicep) for repeatable deployments
 
