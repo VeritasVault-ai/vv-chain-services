@@ -163,71 +163,73 @@ vv-iac/                                # Separate repo - Infrastructure as Code
 
 
 vv-chain-services/
-├── .gitignore                    # Ensure local.settings.json is excluded
-├── package.json                  # Root package.json for workspace management
+|__ .github/                          # NOTE: Created througgh IAC repo and scripted here -  consolidates our piepelines 
+├── .gitignore                        # Ensure local.settings.json is excluded
+├── package.json                      # Root package.json for workspace management
+├── docs                              # NOTE: Created through our docs repo, duplicated here for ease of reference
 ├── src/
-│   ├── function-apps/               # Separated Function Apps for independent scaling/SLAs
-│   │   ├── RiskBotApp/              # Renamed from RiskFunctionApp to align with internal naming
-│   │   │   ├── RiskBotFunction.cs       # Main Azure Function
-│   │   │   ├── RiskApiClient.cs         # Calls Python ML engine
-│   │   │   ├── Models.cs                # Data contracts
+│   ├── function-apps/                # Separated Function Apps for independent scaling/SLAs
+│   │   ├── RiskBotApp/               # Renamed from RiskFunctionApp to align with internal naming
+│   │   │   ├── RiskBotFunction.cs    # Main Azure Function
+│   │   │   ├── RiskApiClient.cs      # Calls Python ML engine
+│   │   │   ├── Models.cs             # Data contracts
 │   │   │   ├── Helpers.cs
-│   │   │   ├── host.json               # Function App host configuration
-│   │   │   └── local.settings.json  # Will be excluded via .gitignore
-│   │   ├── MetricsFunctionApp/  # OpenTelemetry metrics publishing
+│   │   │   ├── host.json             # Function App host configuration
+│   │   │   └── local.settings.json   # Will be excluded via .gitignore
+│   │   ├── MetricsFunctionApp/       # OpenTelemetry metrics publishing
 │   │   │   ├── MetricsBotFunction.cs
 │   │   │   ├── TelemetryService.cs
 │   │   │   ├── host.json
-│   │   │   └── local.settings.json  # Will be excluded via .gitignore
-│   │   ├── AlertFunctionApp/   # Notification triggers
+│   │   │   └── local.settings.json   # Will be excluded via .gitignore
+│   │   ├── AlertFunctionApp/         # Notification triggers
 │   │   │   ├── AlertFunction.cs
 │   │   │   ├── NotificationService.cs
 │   │   │   ├── host.json
 │   │   │   └── local.settings.json  # Will be excluded via .gitignore
-│   │   └── ArchivalFunctionApp/ # Data storage operations
+│   │   └── ArchivalFunctionApp/     # Data storage operations
 │   │       ├── ArchivalFunction.cs
 │   │       ├── StorageService.cs
 │   │       ├── host.json
 │   │       └── local.settings.json  # Will be excluded via .gitignore
-│   ├── shared/                 # Shared code and utilities
-│   │   ├── models/             # Data models
+│   ├── shared/                      # Shared code and utilities
+│   │   ├── models/                  # Data models
 │   │   │   ├── EventModels.cs
 │   │   │   └── DomainModels.cs
-│   │   ├── services/           # Service integrations
+│   │   ├── services/                # Service integrations
 │   │   │   ├── CosmosDbService.cs
 │   │   │   ├── RedisService.cs
 │   │   │   └── KeyVaultService.cs
-│   │   └── utils/              # Helper functions
+│   │   └── utils/                   # Helper functions
 │   │       ├── EventGridHelpers.cs
 │   │       └── TelemetryHelpers.cs
-│   ├── goldsky/                # Goldsky subgraph definitions
-│   │   ├── .goldsky-version      # Track Goldsky CLI version used
-│   │   ├── subgraph.config.yml   # Configuration for multiple GraphQL schemas
-│   │   ├── tezos/              # Tezos-specific subgraphs
+│   ├── goldsky/                    # Goldsky subgraph definitions
+│   │   ├── .goldsky-version        # Track Goldsky CLI version used
+│   │   ├── subgraph.config.yml     # Configuration for multiple GraphQL schemas
+│   │   ├── tezos/                  # Tezos-specific subgraphs
 │   │   │   └── schema.graphql
-│   │   └── evm/                # EVM-specific subgraphs
+│   │   └── evm/                    # EVM-specific subgraphs
 │   │       └── schema.graphql
-│   └── ml-engine/              # Python ML Engine (separate deployable unit)
+│   └── ml-engine/                  # Python ML Engine (separate deployable unit)
 │       ├── app/
-│       │   ├── main.py         # FastAPI app
-│       │   ├── models/         # ML models (pickle / joblib / ONNX)
-│       │   ├── services/       # Risk calculations
-│       │   ├── schemas/        # Input/output Pydantic schemas
-│       │   └── utils/          # Normalizers, scorers, etc.
-│       ├── tests/              # Python-specific tests
+│       │   ├── main.py             # FastAPI app
+│       │   ├── models/             # ML models (pickle / joblib / ONNX)
+│       │   ├── services/           # Risk calculations
+│       │   ├── schemas/            # Input/output Pydantic schemas
+│       │   └── utils/              # Normalizers, scorers, etc.
+│       ├── tests/                  # Python-specific tests
 │       │   ├── test_risk_calculations.py
 │       │   └── test_api.py
-│       ├── requirements.txt    # Python dependencies
-│       ├── Dockerfile          # ML Engine container definition
-│       └── package.json        # Node.js dependencies for ML Engine
-├── tests/                      # C# tests for Azure Functions
+│       ├── requirements.txt        # Python dependencies
+│       ├── Dockerfile              # ML Engine container definition
+│       └── package.json            # Node.js dependencies for ML Engine
+├── tests/                          # C# tests for Azure Functions
 │   ├── RiskBotTests/
 │   │   ├── RiskBotFunctionTests.cs
 │   │   └── RiskApiClientTests.cs
 │   ├── MetricsFunctionTests/
 │   ├── AlertFunctionTests/
 │   └── ArchivalFunctionTests/
-└── README.md                   # Repository documentation
+└── README.md                       # Repository documentation
 
 ```
 
