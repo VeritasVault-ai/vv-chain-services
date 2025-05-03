@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BlackLittermanConfig",
+  "type": "object",
+  "description": "Configuration for the Black-Litterman model with crypto market data.",
+  "properties": {
+    "Model": {
+      "type": "string",
+      "enum": ["BlackLitterman"],
+      "description": "Specifies the model type; currently only supports 'BlackLitterman'."
+    },
+    "ModelParameters": {
+      "type": "object",
+      "description": "Optional parameters to adjust the Black-Litterman model.",
+      "properties": {
+        "RiskAversion": {
+          "type": "number",
+          "description": "Optional risk aversion coefficient (e.g., 2.5)."
+        },
+        "UncertaintyInPrior": {
+          "type": "number",
+          "description": "Optional uncertainty in prior estimates (e.g., 0.05)."
+        }
+      }
+    },
+    "RiskFreeRates": {
+      "type": "array",
+      "description": "List of risk-free rates for different terms.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "term": {
+            "type": "string",
+            "pattern": "^[1-9]\\d*(B|D|W|M|Y)$",
+            "description": "Term as a number followed by B (business days), D (days), W (weeks), M (months), or Y (years), e.g., '1B', '3D', '2M'."
+          },
+          "rate": {
+            "type": "number",
+            "description": "Risk-free rate as a number (e.g., 0.0175)."
+          }
+        },
+        "required": ["term", "rate"]
+      }
+    },
+    "CryptoMarketData": {
+      "type": "array",
+      "description": "Array of crypto liquidity pools and their market data.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Pool": {
+            "type": "string",
+            "description": "Name of the liquidity pool (e.g., 'STETH')."
+          },
+          "Project": {
+            "type": "string",
+            "description": "Name of the DeFi project (e.g., 'Lido')."
+          },
+          "Chain": {
+            "type": "string",
+            "description": "Blockchain where the pool is deployed (e.g., 'Ethereum')."
+          },
+          "Metrics": {
+            "type": "array",
+            "description": "List of time-series metrics for the pool.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Date": {
+                  "type": "string",
+                  "pattern": "^\\d{4}-\\d{2}-\\d{2}[Tt ]\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,3})?([Zz]|([+-]\\d{2}:\\d{2}))$",
+                  "description": "ISO8601 date-time with optional milliseconds (e.g., '2025-05-03T15:30:00.123Z')."
+                },
+                "TVL": {
+                  "type": "number",
+                  "description": "Total value locked in the pool, as a number."
+                },
+                "APY": {
+                  "type": "number",
+                  "description": "Total annual percentage yield as a number (e.g., 0.0523 for 5.23%)."
+                },
+                "Base APY": {
+                  "type": "string",
+                  "pattern": "^[0-9.]+%$",
+                  "description": "Base APY percentage from the protocol, as a number (e.g., 0.05 for 5%)."
+                },
+                "Reward APY": {
+                  "type": "string",
+                  "pattern": "^[0-9.]+%$",
+                  "description": "Reward APY from incentives, as a number (e.g., 0.0023 for 0.23%)."
+                }
+              },
+              "required": ["Date", "TVL", "APY"]
+            }
+          }
+        },
+        "required": ["Pool", "Project", "Chain", "Metrics"]
+      }
+    }
+  },
+  "required": ["Model", "ModelParameters", "RiskFreeRates", "CryptoMarketData"]
+}
