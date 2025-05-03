@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BlackLittermanModelResults",
+  "type": "object",
+  "description": "Schema for Black-Litterman model results including views and allocations.",
+  "properties": {
+    "Model": {
+      "type": "string",
+      "enum": ["BlackLitterman"],
+      "description": "Specifies the model type; only 'BlackLitterman' is supported."
+    },
+    "ModelResults": {
+      "type": "array",
+      "description": "List of model results, each containing views and allocations.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Views": {
+            "type": "array",
+            "description": "List of market views with asset weights and expected returns.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Weights": {
+                  "type": "array",
+                  "description": "List of asset weights in the view.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "asset": {
+                        "type": "string",
+                        "description": "Asset name (e.g., 'stETH', 'tzBTC', 'USDC')."
+                      },
+                      "weight": {
+                        "type": "number",
+                        "description": "Weight of the asset in the view, positive or negative."
+                      }
+                    },
+                    "required": ["asset", "weight"]
+                  }
+                },
+                "Return": {
+                  "type": "number",
+                  "description": "Expected return for the view."
+                }
+              },
+              "required": ["Weights", "Return"]
+            }
+          },
+          "Allocations": {
+            "type": "array",
+            "description": "Final portfolio allocations from the model.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "asset": {
+                  "type": "string",
+                  "description": "Asset name (e.g., 'stETH', 'tzBTC', 'USDC')."
+                },
+                "weight": {
+                  "type": "number",
+                  "description": "Weight assigned to the asset in the final allocation."
+                }
+              },
+              "required": ["asset", "weight"]
+            }
+          }
+        },
+        "required": ["Views", "Allocations"]
+      }
+    }
+  },
+  "required": ["Model", "ModelResults"]
+}

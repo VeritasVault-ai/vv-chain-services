@@ -3,18 +3,21 @@ from dataclasses_json import dataclass_json
 from typing import List, Optional
 
 
+@dataclass_json
 @dataclass
 class ModelParameters:
     RiskAversion: Optional[float] = field(default=2.5)
     UncertaintyInPrior: Optional[float] = field(default=0.05)
 
 
+@dataclass_json
 @dataclass
 class RiskFreeRate:
     term: str
     rate: float
 
 
+@dataclass_json
 @dataclass
 class Metrics:
     Date: str
@@ -24,6 +27,7 @@ class Metrics:
     Reward_APY: Optional[float] = field(default=None)
 
 
+@dataclass_json
 @dataclass
 class CryptoMarketData:
     Pool: str

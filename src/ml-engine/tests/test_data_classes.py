@@ -1,5 +1,5 @@
 import pytest
-from main_app.data_classes.bl_model_data import BlackLittermanModelData
+from main_app.data_classes.BlackLittermanModelData import BlackLittermanModelData
 
 
 @pytest.fixture
