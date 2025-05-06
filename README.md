@@ -4,7 +4,7 @@ Blockchain integration and event processing services for the VeritasVault.ai pla
 
 ## 🔍 Overview
 
-This repository contains the event-driven microservices responsible for ingesting, processing, analyzing, and archiving blockchain event data from Tezos and EVM networks. It is part of the VeritasVault.ai platform and is tightly integrated with Pinax, Plurality, Goldsky, EtherMail, and a distributed risk intelligence engine powered by Python-based ML.
+This repository contains the event-driven microservices responsible for ingesting, processing, analyzing, and archiving blockchain event data from Tezos and EVM networks. It is part of the VeritasVault.ai platform and is tightly integrated with Pinax, Plurality, Goldsky, EtherMail, EigenLayer, and EtherLink, with a distributed risk intelligence engine powered by Python-based ML.
 
 The solution is designed with resilience, observability, and modularity in mind — allowing independent teams to scale risk models, extend observability, or hook in new event sources with minimal friction.
 
@@ -34,11 +34,13 @@ flowchart TB
     Tezos["Tezos Network"]
     EVM["EVM Networks"]
     EigenLayer["EigenLayer"]
+    EtherLink["EtherLink"]
   end
 
   subgraph "Data Ingestion"
     GoldskyTezos["Goldsky Tezos Subgraph"]
     GoldskyEVM["Goldsky EVM Subgraph"]
+    GoldskyEtherLink["Goldsky EtherLink Subgraph"]
   end
 
   subgraph "Cross-Chain Infrastructure"
@@ -84,12 +86,15 @@ flowchart TB
 
   Tezos --> GoldskyTezos
   EVM --> GoldskyEVM
+  EtherLink --> GoldskyEtherLink
   GoldskyTezos --> EventGrid
   GoldskyEVM --> EventGrid
+  GoldskyEtherLink --> EventGrid
   
   Tezos --> PinaxSDK
   EVM --> PinaxSDK
   EigenLayer --> PinaxSDK
+  EtherLink --> PinaxSDK
   PinaxSDK --> RiskBot
   
   EventGrid --> RiskBot
@@ -156,8 +161,13 @@ vv-chain-services/
 │   │   ├── PinaxSDK/            # Pinax multi-chain integration SDK
 │   │   ├── EtherMailClient/     # EtherMail API client
 │   │   ├── PluralityClient/     # Plurality API client
+│   │   ├── EigenLayerSDK/       # EigenLayer integration SDK
+│   │   ├── EtherLinkSDK/        # EtherLink compatibility layer SDK
 │   │   └── GoldskyModels/       # Goldsky event models and parsers
 │   ├── goldsky/                 # Goldsky subgraph definitions
+│   │   ├── tezos/               # Tezos-specific subgraphs
+│   │   ├── evm/                 # EVM-specific subgraphs
+│   │   └── etherlink/           # EtherLink-specific subgraphs
 │   └── ml-engine/               # Python ML Engine (separate deployable unit)
 └── tests/                       # C# tests for Azure Functions
 ```
@@ -167,7 +177,7 @@ For a complete folder structure with detailed explanations, see [FOLDER-STRUCTUR
 ## 📀 Data Flow Overview
 
 ```
-Blockchain (Tezos / EVM / EigenLayer)
+Blockchain (Tezos / EVM / EigenLayer / EtherLink)
         ⬇️
     Goldsky Subgraph       Pinax SDK
         ⬇️                    ⬇️
@@ -266,93 +276,62 @@ Alternatively, you can use the VS Code tasks defined in the workspace:
 
 ## 🔗 Platform Integrations
 
-### Goldsky Integration
+### Core Infrastructure Components
 
-Goldsky provides the primary blockchain data ingestion layer for the VeritasVault.ai platform, enabling real-time event monitoring across multiple chains.
+#### Pinax Integration
 
-#### Key Components
+Pinax provides the multi-chain infrastructure that enables VeritasVault.ai to operate seamlessly across Tezos, EVM chains, EigenLayer, and EtherLink.
 
-- **Tezos Subgraph**: Indexes Tezos smart contracts and operations
-- **EVM Subgraph**: Indexes Ethereum and EVM-compatible chains
-- **Webhook Delivery**: Pushes events to Azure Event Grid in real-time
-- **Event Filtering**: Reduces noise by filtering events at the source
-
-#### Implementation Details
-
-```graphql
-# Example Goldsky subgraph for monitoring vault deposits
-type VaultDeposit @entity {
-  id: ID!
-  user: Bytes!
-  amount: BigInt!
-  timestamp: BigInt!
-  asset: String!
-}
-
-type VaultWithdrawal @entity {
-  id: ID!
-  user: Bytes!
-  amount: BigInt!
-  timestamp: BigInt!
-  asset: String!
-}
-```
-
-### Pinax Integration
-
-Pinax provides the multi-chain infrastructure that enables VeritasVault.ai to operate seamlessly across Tezos, EVM chains, and EigenLayer.
-
-#### Key Components
-
+**Key Components:**
 - **Unified Wallet Connection**: Single connection point for users across chains
 - **Cross-Chain Transaction Management**: Atomic execution of related transactions
 - **Multi-Chain Data Indexing**: Aggregation of performance data across security layers
 - **Transaction Bundling**: Enables complex cross-chain operations
 
-#### Implementation Details
+#### Goldsky Integration
 
-```csharp
-// Example of using Pinax SDK for cross-chain operations
-public async Task<TransactionResult> ExecuteSecurityValidation(string userAddress, decimal amount)
-{
-    // Create transaction bundle across multiple chains
-    var txBundle = await _pinaxService.CreateTransactionBundle(new[]
-    {
-        new ChainTransaction
-        {
-            Chain = Chain.Ethereum,
-            To = _configuration["Contracts:EigenLayer"],
-            Data = EncodeFunction("validateStake", userAddress, amount)
-        },
-        new ChainTransaction
-        {
-            Chain = Chain.Tezos,
-            To = _configuration["Contracts:TezosVault"],
-            Data = EncodeFunction("updateSecurityScore", userAddress)
-        }
-    });
-    
-    // Execute with security validations
-    return await _pinaxService.ExecuteBundle(txBundle, new ExecutionOptions
-    {
-        EnableSecurityValidations = true,
-        RollbackOnFailure = true
-    });
-}
-```
+Goldsky provides the primary blockchain data ingestion layer for the VeritasVault.ai platform, enabling real-time event monitoring across multiple chains.
 
-### EtherMail Integration
+**Key Components:**
+- **Tezos Subgraph**: Indexes Tezos smart contracts and operations
+- **EVM Subgraph**: Indexes Ethereum and EVM-compatible chains
+- **EtherLink Subgraph**: Indexes EtherLink operations (EVM on Tezos)
+- **Webhook Delivery**: Pushes events to Azure Event Grid in real-time
+- **Event Filtering**: Reduces noise by filtering events at the source
+
+#### EigenLayer Integration
+
+EigenLayer provides additional security through restaking, enhancing the platform's security model and enabling additional yield opportunities.
+
+**Key Components:**
+- **Restaking Protocol**: Enables ETH validators to secure multiple networks
+- **AVS Integration**: Connects with Actively Validated Services
+- **Enhanced Security Model**: Provides additional security guarantees
+- **Yield Optimization**: Creates additional yield opportunities through restaking
+
+#### EtherLink Integration
+
+EtherLink brings EVM compatibility to the Tezos ecosystem, expanding deployment options and creating a bridge between ecosystems.
+
+**Key Components:**
+- **EVM Compatibility**: Runs Ethereum smart contracts on Tezos
+- **Optimistic Rollup Architecture**: Processes transactions off-chain for scalability
+- **Cross-Chain Interoperability**: Enables asset transfers between Tezos and EVM environments
+- **Development Flexibility**: Supports both Solidity and Michelson development
+
+### Service Components
+
+#### EtherMail Integration
 
 EtherMail provides secure, wallet-verified communications for critical alerts, governance notifications, and personalized updates.
 
-#### Key Components
-
+**Key Components:**
 - **Wallet-Verified Communications**: Cryptographically linked to verified wallets
 - **Tiered Alert System**: Prioritized delivery based on urgency and impact
 - **Governance Communications**: Secure distribution of proposals and voting information
 - **Personalized Updates**: User-specific vault performance and risk notifications
 
-#### Tiered Alert System
+**Tiered Alert System:**
 | Alert Level | Description | Delivery Method |
 |------------|-------------|----------------|
 | Critical | Security breaches, emergency governance actions | Immediate EtherMail + push + on-chain record |
@@ -360,19 +339,17 @@ EtherMail provides secure, wallet-verified communications for critical alerts, g
 | Medium | Governance proposals, performance updates | Daily EtherMail digest |
 | Low | Educational content, minor updates | Weekly EtherMail newsletter |
 
-### Plurality Integration
+#### Plurality Integration
 
 Plurality provides identity verification and reputation systems that enhance governance and security for the VeritasVault.ai platform.
 
-#### Key Components
-
+**Key Components:**
 - **Identity Verification**: Ensures one-person-one-vote for governance
 - **Reputation System**: Tracks and rewards valuable contributions
 - **Expertise-Weighted Voting**: Weights votes by domain expertise
 - **Black-Litterman Model Integration**: Enhances risk models with expert opinions
 
-#### Reputation Domains
-
+**Reputation Domains:**
 | Expertise Domain | Reputation Factors |
 |-----------------|-------------------|
 | Security | Successful security proposals, vulnerability identification, audit participation |
@@ -425,6 +402,10 @@ dotnet test
 # Run Pinax SDK tests
 cd tests/PinaxSDKTests
 dotnet test
+
+# Run EtherLink SDK tests
+cd tests/EtherLinkSDKTests
+dotnet test
 ```
 
 ### Python Tests
@@ -433,14 +414,6 @@ dotnet test
 cd src/ml-engine
 pytest
 ```
-
-## 🔨 Goldsky Setup Notes
-
-- Use `webhook` target type (POST)
-- Payload format: JSON
-- Use filtering logic in subgraph to minimize spam
-- Include retry logic on failed webhook delivery (Goldsky handles retries)
-- Include event signatures and timestamps for deduplication
 
 ## 🌐 Security & Observability
 
@@ -452,41 +425,47 @@ pytest
 - Key Vault integration for secure secret management
 - EtherMail provides cryptographic verification of message delivery and reading
 - Plurality provides Sybil-resistant identity verification for governance
+- Triple-layer security model across Tezos, EVM chains, and EigenLayer
 
 ## ♻️ Benefits of This Architecture
 
-#### **Multi-Chain Security Model**
-Pinax enables the triple-layer security model across Tezos, EVM chains, and EigenLayer
+#### **Triple-Layer Security Model**
+- Pinax enables security coordination across Tezos, EVM chains, and EigenLayer
+- EtherLink provides additional security through Tezos consensus
+
+#### **Ecosystem Bridging**
+- EtherLink creates a seamless bridge between Tezos and EVM ecosystems
+- Deploy the same contract logic across multiple environments
 
 #### **Expertise-Driven Governance**
-Plurality's reputation system ensures that governance decisions benefit from domain expertise
+- Plurality's reputation system ensures that governance decisions benefit from domain expertise
 
 #### **Secure Communications**
-EtherMail provides wallet-verified communications for critical alerts and governance
+- EtherMail provides wallet-verified communications for critical alerts and governance
 
 #### **Real-Time Event Processing**
-Goldsky enables instant notification and response to on-chain events
+- Goldsky enables instant notification and response to on-chain events
 
 #### **Decoupled Processing**
-Each Function App operates independently, allowing for flexible scaling and deployment
+- Each Function App operates independently, allowing for flexible scaling and deployment
 
 #### **High Resilience**
-Event Grid provides reliable delivery with retries and dead letter queues
+- Event Grid provides reliable delivery with retries and dead letter queues
 
 #### **Scalable**
-Can handle increasing volumes of blockchain events as the platform grows
+- Can handle increasing volumes of blockchain events as the platform grows
 
 #### **Observable**
-Comprehensive logging and monitoring throughout the pipeline
+- Comprehensive logging and monitoring throughout the pipeline
 
 #### **Secure**
-Managed Identities and Key Vault integration for secure secret management
+- Managed Identities and Key Vault integration for secure secret management
 
 #### **DevOps-Friendly**
-Infrastructure as Code (Bicep) for repeatable deployments
+- Infrastructure as Code (Bicep) for repeatable deployments
 
 #### **Independent Scaling**
-Each Function App can scale based on its specific workload and requirements
+- Each Function App can scale based on its specific workload and requirements
 
 ## 📝 Documentation
 
@@ -499,6 +478,9 @@ Additional documentation is available in the following files:
 - [PINAX-SDK.md](PINAX-SDK.md) - Guide to using the Pinax SDK for multi-chain operations
 - [PLURALITY-INTEGRATION.md](PLURALITY-INTEGRATION.md) - Documentation on Plurality identity and reputation systems
 - [GOLDSKY-SETUP.md](GOLDSKY-SETUP.md) - Detailed guide for setting up Goldsky subgraphs
+- [EIGENLAYER-INTEGRATION.md](EIGENLAYER-INTEGRATION.md) - Guide to EigenLayer integration and restaking
+- [ETHERLINK-INTEGRATION.md](ETHERLINK-INTEGRATION.md) - Documentation on EtherLink EVM compatibility layer
+- [AZURE-INFRASTRUCTURE.md](Azure-INFRASTRUCTURE.md) - Documentation on Azure infratructure
 
 ## 👥 Contributing
 
