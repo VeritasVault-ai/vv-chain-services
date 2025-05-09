@@ -11,5 +11,13 @@ class BlackLittermanYieldModel:
 
 
 class BlackLittermanYieldModelResult:
-    def __init__(self, views: List, allocations: List):
-        pass
+    """
+    Represents the results of a Black-Litterman model calculation.
+
+    Attributes:
+        views: List of views on expected returns
+        allocations: List of recommended asset allocations
+    """
+    def __init__(self, views: List[float], allocations: List[float]):
+        self.views = views
+        self.allocations = allocations
