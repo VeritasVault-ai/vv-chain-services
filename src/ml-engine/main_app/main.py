@@ -10,6 +10,11 @@ from main_app.data_classes.BlackLittermanModelData import BlackLittermanModelDat
 
 class ModelEndpoint(HTTPEndpoint):
     async def post(self, request):
+        """
+        Handles HTTP POST requests to run a specified financial model with validated input data.
+        
+        Parses the incoming JSON payload, validates it against a predefined schema, and invokes the model execution. Returns a JSON response with the model results or an error message if validation or schema loading fails.
+        """
         data = await request.json()
         model_name = request.path_params['model_name']
 
@@ -35,6 +40,23 @@ class ModelEndpoint(HTTPEndpoint):
 
 async def run_model(model_name, payload):
     # Place your model running code here
+    """
+    Runs the specified financial model asynchronously with the provided input data.
+    
+    Currently, only the "BlackLitterman" model is supported. The input payload is converted
+    to a model data instance, the model is executed asynchronously, and the results are
+    returned as a JSON-serializable object.
+    
+    Args:
+        model_name: The name of the model to run. Must be "BlackLitterman".
+        payload: A dictionary containing the input data for the model.
+    
+    Returns:
+        A JSON-serializable dictionary with the model results.
+    
+    Raises:
+        Exception: If the model_name is not "BlackLitterman".
+    """
     if model_name != 'BlackLitterman':
         raise Exception('Only BlackLitterman model is supported at present')
 
