@@ -13,14 +13,22 @@ class ModelEndpoint(HTTPEndpoint):
         data = await request.json()
         model_name = request.path_params['model_name']
 
-        schema_file = 'data_classes/BlackLittermanModelDataSchema.json'
-        with open(schema_file, 'r') as file:
-            schema = json.load(file)
+        try:
+            import os
+            schema_file = os.path.join(
+                os.path.dirname(__file__),
+                'data_classes',
+                'BlackLittermanModelDataSchema.json'
+            )
+            with open(schema_file, 'r') as file:
+                schema = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            return JSONResponse({'error': f"Schema error: {str(e)}"}, status_code=500)
+
         try:
             validate(instance=data, schema=schema)
         except ValidationError as e:
             return JSONResponse({'error': str(e)}, status_code=400)
-
         result = run_model(model_name, data)
         return JSONResponse({'result': result})
 
