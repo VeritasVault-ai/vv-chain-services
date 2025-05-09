@@ -38,17 +38,22 @@ async def run_model(model_name, payload):
     if model_name != 'BlackLitterman':
         raise Exception('Only BlackLitterman model is supported at present')
 
-    model_data = BlackLittermanModelData.from_dict(payload)
-    
-    # Import and instantiate the model
-    from main_app.models.blacklittermanyieldmodel import BlackLittermanYieldModel
-    model = BlackLittermanYieldModel(model_data)
-    
-    # Run the model and get results
-    results = await model.run()
-    
-    # Return JSON serialized results
-    return results.to_json()
+    try:
+        model_data = BlackLittermanModelData.from_dict(payload)
+        
+        # Import and instantiate the model
+        from main_app.models.blacklittermanyieldmodel import BlackLittermanYieldModel
+        model = BlackLittermanYieldModel(model_data)
+        
+        # Run the model and get results
+        results = await model.run()
+        
+        # Return JSON serialized results
+        return results.to_json()
+    except Exception as e:
+        import logging
+        logging.error(f"Error running model: {str(e)}")
+        raise Exception(f"Failed to run {model_name} model: {str(e)}")
 
 routes = [
     Route('/run_model/{model_name}', ModelEndpoint),
