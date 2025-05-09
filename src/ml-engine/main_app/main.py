@@ -38,66 +38,17 @@ async def run_model(model_name, payload):
     if model_name != 'BlackLitterman':
         raise Exception('Only BlackLitterman model is supported at present')
 
-    # model_data = BlackLittermanModelData.from_json(payload)
-    # todo: create model, and process
-
-    return """
-{
-  "Model": "BlackLitterman",
-  "ModelResults": [
-    {
-      "Views": [
-        {
-          "Weights": [
-            { "asset": "stETH", "weight": 1.0 },
-            { "asset": "tzBTC", "weight": -1.0 }
-          ],
-          "Return": 0.0125
-        },
-        {
-          "Weights": [
-            { "asset": "USDC", "weight": 1.0 }
-          ],
-          "Return": 0.03
-        }
-      ],
-      "Allocations": [
-        { "asset": "stETH", "weight": 0.5 },
-        { "asset": "tzBTC", "weight": 0.2 },
-        { "asset": "USDC", "weight": 0.3 }
-      ]
-    },
-    {
-      "Views": [
-        {
-          "Weights": [
-            { "asset": "stETH", "weight": 1.0 },
-            { "asset": "USDC", "weight": -1.0 }
-          ],
-          "Return": 0.02
-        },
-        {
-          "Weights": [
-            { "asset": "USDC", "weight": 1.0 }
-          ],
-          "Return": 0.02
-        },
-        {
-          "Weights": [
-            { "asset": "tzBTC", "weight": 1.0 }
-          ],
-          "Return": 0.035
-        }
-      ],
-      "Allocations": [
-        { "asset": "stETH", "weight": 0.4 },
-        { "asset": "tzBTC", "weight": 0.5 },
-        { "asset": "USDC", "weight": 0.1 }
-      ]
-    }
-  ]
-}
-"""
+    model_data = BlackLittermanModelData.from_dict(payload)
+    
+    # Import and instantiate the model
+    from main_app.models.blacklittermanyieldmodel import BlackLittermanYieldModel
+    model = BlackLittermanYieldModel(model_data)
+    
+    # Run the model and get results
+    results = await model.run()
+    
+    # Return JSON serialized results
+    return results.to_json()
 
 routes = [
     Route('/run_model/{model_name}', ModelEndpoint),
