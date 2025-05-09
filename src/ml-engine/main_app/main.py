@@ -29,9 +29,12 @@ class ModelEndpoint(HTTPEndpoint):
             validate(instance=data, schema=schema)
         except ValidationError as e:
             return JSONResponse({'error': str(e)}, status_code=400)
-        result = run_model(model_name, data)
-        return JSONResponse({'result': result})
 
+        try:
+            result = await run_model(model_name, data)
+            return JSONResponse({'result': result})
+        except Exception as e:
+            return JSONResponse({'error': f"Model execution error: {str(e)}"}, status_code=500)
 
 async def run_model(model_name, payload):
     # Place your model running code here
