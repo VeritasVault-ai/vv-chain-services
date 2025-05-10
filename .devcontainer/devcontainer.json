@@ -9,57 +9,75 @@
     "vscode": {
       "extensions": [
         // .NET Development
-        "ms-dotnettools.csharp",
-        "ms-dotnettools.csdevkit",
-        "formulahendry.dotnet-test-explorer",
-        "ms-azuretools.vscode-azurefunctions",
+        "ms-dotnettools.csdevkit",               // C# Dev Kit (includes C# extension)
+        "ms-dotnettools.vscode-dotnet-runtime",  // .NET Runtime Install Tool
+        "formulahendry.dotnet-test-explorer",    // .NET Test Explorer
+        "ms-azuretools.vscode-azurefunctions",   // Azure Functions
+        "tintoy.msbuild-project-tools",          // MSBuild project tools
         
         // Python Development
-        "ms-python.python",
-        "ms-python.vscode-pylance",
-        "ms-python.black-formatter",
-        "njpwerner.autodocstring",
-        "matangover.mypy",
-        
+        "ms-python.python",                      // Python extension
+        "ms-python.vscode-pylance",              // Python language server
+        "ms-python.black-formatter",             // Black formatter
+        "njpwerner.autodocstring",               // Auto docstring generator
+        "matangover.mypy",                       // Type checking
+        "charliermarsh.ruff",                    // Fast Python linter (replaces flake8, pylint, isort)
         // Cloud & DevOps
-        "ms-azuretools.vscode-docker",
-        "ms-kubernetes-tools.vscode-kubernetes-tools",
-        "ms-vscode.azure-account",
-        "ms-vscode.vscode-node-azure-pack",
+        "ms-azuretools.vscode-docker",           // Docker
+        "ms-kubernetes-tools.vscode-kubernetes-tools", // Kubernetes
+        "ms-vscode.vscode-node-azure-pack",      // Azure Tools
+        "ms-azuretools.vscode-bicep",            // Azure Bicep
+        "hashicorp.terraform",                   // Terraform
         
         // General Development
-        "github.copilot",
-        "github.vscode-pull-request-github",
-        "eamodio.gitlens",
-        "redhat.vscode-yaml",
-        "esbenp.prettier-vscode",
-        "editorconfig.editorconfig",
-        
+        "github.copilot",                        // GitHub Copilot
+        "github.copilot-chat",                   // GitHub Copilot Chat
+        "github.vscode-github-actions",          // GitHub Actions
+        "github.vscode-pull-request-github",     // GitHub Pull Requests
+        "eamodio.gitlens",                       // GitLens
+        "redhat.vscode-yaml",                    // YAML
+        "esbenp.prettier-vscode",                // Prettier
+        "editorconfig.editorconfig",             // EditorConfig
+        "dbaeumer.vscode-eslint",                // ESLint
         // Quality & Testing
-        "streetsidesoftware.code-spell-checker",
-        "visualstudioexptteam.vscodeintellicode",
-        "ryanluker.vscode-coverage-gutters",
-        "yzhang.markdown-all-in-one",
+        "streetsidesoftware.code-spell-checker", // Code Spell Checker
+        "visualstudioexptteam.vscodeintellicode", // IntelliCode
+        "ryanluker.vscode-coverage-gutters",     // Coverage Gutters
+        "yzhang.markdown-all-in-one",            // Markdown All in One
+        "davidanson.vscode-markdownlint",        // Markdown linting
         
         // Database
-        "cweijan.vscode-redis-client",
+        "cweijan.vscode-redis-client",           // Redis Client
+        "ms-mssql.mssql",                        // SQL Server
         
         // Productivity
-        "wayou.vscode-todo-highlight",
-        "gruntfuggly.todo-tree",
-        "vscode-icons-team.vscode-icons",
-        "aaron-bond.better-comments",
-        "christian-kohler.path-intellisense",
-        "usernamehw.errorlens"
+        "gruntfuggly.todo-tree",                 // TODO Tree (more feature-rich than todo-highlight)
+        "vscode-icons-team.vscode-icons",        // VS Code Icons
+        "aaron-bond.better-comments",            // Better Comments
+        "christian-kohler.path-intellisense",    // Path Intellisense
+        "usernamehw.errorlens",                  // Error Lens
+        "tamasfe.even-better-toml",              // TOML support
+        "redhat.vscode-xml",                     // XML support
+        "ms-vsliveshare.vsliveshare",            // Live Share
+        "mechatroner.rainbow-csv"                // Rainbow CSV
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash",
         "python.defaultInterpreterPath": "/usr/local/bin/python",
         "python.linting.enabled": true,
-        "python.linting.pylintEnabled": true,
+        "python.linting.pylintEnabled": false,    // Disable pylint since we're using Ruff
+        "python.linting.flake8Enabled": false,    // Disable flake8 since we're using Ruff
         "python.formatting.provider": "black",
+        "python.formatting.blackPath": "/usr/local/bin/black",
         "editor.formatOnSave": true,
         "editor.rulers": [88, 120],
+        "editor.codeActionsOnSave": {
+          "source.fixAll": true,
+          "source.fixAll.ruff": true,            // Use Ruff for auto-fixing
+          "ruff.organizeImports": true           // Use Ruff for import sorting instead of isort
+        },
+        "ruff.enable": true,                     // Enable Ruff
+        "ruff.importStrategy": "fromEnvironment", // Use Ruff from environment
         "files.exclude": {
           "**/.git": true,
           "**/.DS_Store": true,
@@ -71,7 +89,13 @@
         },
         "csharp.format.enable": true,
         "omnisharp.enableRoslynAnalyzers": true,
-        "omnisharp.enableEditorConfigSupport": true
+        "omnisharp.enableEditorConfigSupport": true,
+        "github.copilot.enable": {
+          "*": true
+        },
+        "[markdown]": {
+          "editor.defaultFormatter": "yzhang.markdown-all-in-one"  // Use Markdown All in One as formatter
+        }
       }
     }
   },
