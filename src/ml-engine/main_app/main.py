@@ -3,8 +3,10 @@ from starlette.routing import Route
 from starlette.responses import JSONResponse
 from starlette.endpoints import HTTPEndpoint
 from jsonschema import validate, ValidationError
+from main_app.models.BlackLittermanYieldModel import BlackLittermanYieldModel
 import json
 import uvicorn
+
 
 from main_app.data_classes.BlackLittermanModelData import BlackLittermanModelData
 
@@ -30,9 +32,12 @@ async def run_model(model_name, payload):
     if model_name != 'BlackLitterman':
         raise Exception('Only BlackLitterman model is supported at present')
 
+    # Build model and calculate
     # model_data = BlackLittermanModelData.from_json(payload)
-    # todo: create model, and process
+    # model = BlackLittermanYieldModel(model_data=model_data)
+    # model.calculate()
 
+    # todo For mvp, return sample portfolio. Replace with above once data has been integrated.
     return """
 {
   "Model": "BlackLitterman",
