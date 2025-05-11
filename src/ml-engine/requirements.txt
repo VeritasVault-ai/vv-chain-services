@@ -6,3 +6,4 @@ matplotlib~=3.10.1
 pyportfolioopt~=1.5.6
 starlette~=0.46.2
 dataclasses_json~=0.6.7
+jsonschema~=4.23.0
