@@ -10,11 +10,23 @@ from main_app.data_classes.BlackLittermanModelResult import BlackLittermanModelR
 
 class ViewGenerator:
     def __init__(self, indexes: List[str], apy_data: pd.DataFrame):
+        """
+        Initializes the ViewGenerator with asset indexes and APY data.
+        
+        Args:
+            indexes: List of asset identifiers.
+            apy_data: DataFrame containing APY data for the assets.
+        """
         self._indexes = indexes
         self._apy_data = apy_data
 
     def calculate(self) -> List[pd.Series]:
         # Extract data
+        """
+        Generates a list of normalized view vectors based on momentum and valuation signals.
+        
+        Calculates 3-month momentum and a valuation proxy for each asset, combines them using different weights, normalizes each resulting view, and returns the list of view series.
+        """
         apy_data = self._apy_data
 
         # Calculate historical returns and covariance
@@ -36,6 +48,11 @@ class ViewGenerator:
 
 class BlackLittermanYieldModel:
     def __init__(self, model_data: BlackLittermanModelData):
+        """
+        Initializes the Black-Litterman yield model with market data.
+        
+        Constructs asset identifiers, APY, and TVL data frames from the provided model data. Raises a ValueError if required market data is missing. Instantiates a ViewGenerator for generating views based on the APY data.
+        """
         self.model_data = model_data
 
         self._indexes = ["{}.{}.{}".format(datum.Chain, datum.Pool, datum.Project) for datum in model_data.CryptoMarketData]
@@ -58,6 +75,14 @@ class BlackLittermanYieldModel:
         self.view_generator = ViewGenerator(self._indexes, self._apy_data)
 
     def calculate(self) -> BlackLittermanModelResults:
+        """
+        Runs the Black-Litterman portfolio optimization using APY and TVL data.
+        
+        Calculates the sample covariance and equilibrium market returns, generates multiple views based on momentum and valuation signals, and applies the Black-Litterman model to adjust expected returns and covariances. For each view, optimizes the portfolio for maximum Sharpe ratio and aggregates the resulting views and allocations into model results.
+        
+        Returns:
+            BlackLittermanModelResults: The results of the Black-Litterman optimization, including per-view portfolio allocations and view details.
+        """
         indexes = self._indexes
         apy_data = self._apy_data
         tvl_data = self._tvl_data
