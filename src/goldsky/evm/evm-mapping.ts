@@ -57,15 +57,13 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
     vault.createdAt = event.block.timestamp;
   }
   
-  // Update vault data
-  // Validate withdrawal amount to prevent negative balances
-  if (vault.totalValue.ge(amount)) {
-    vault.totalValue = vault.totalValue.minus(amount);
+  // Withdrawal: ensure we don't go negative
+  if (vault.totalValue.ge(event.params.amount)) {
+    vault.totalValue = vault.totalValue.minus(event.params.amount);
   } else {
-    // Handle insufficient funds case - either log an error or set to zero
+    // Handle insufficient funds case – here we zero out, but you may want to log or revert
     vault.totalValue = BigInt.fromI32(0);
   }
-  
   vault.updatedAt = event.block.timestamp;
   vault.save();
   

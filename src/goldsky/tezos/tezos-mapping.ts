@@ -1,7 +1,23 @@
 import { BigInt } from '@graphprotocol/graph-ts';
 import { Vault, Transaction, PriceUpdate } from '../generated/schema';
 
-export function handleDeposit(event: any): void {
+interface TezosDepositEvent {
+  parameters: {
+    from: string;
+    amount: string;
+  };
+  timestamp: BigInt | string;
+  operation: {
+    hash: string;
+  };
+  block: {
+    level: BigInt | string;
+  };
+  id: string;
+  source: string;
+}
+
+export function handleDeposit(event: TezosDepositEvent): void {
   // Extract data from the Tezos event
   let vaultId = event.parameters.from;
   let amount = BigInt.fromString(event.parameters.amount);
@@ -56,7 +72,6 @@ export function handleWithdrawal(event: any): void {
     // Handle insufficient funds case - either log an error or set to zero
     vault.totalValue = BigInt.fromI32(0);
   }
-  
   vault.updatedAt = BigInt.fromString(event.timestamp.toString());
   vault.save();
   
