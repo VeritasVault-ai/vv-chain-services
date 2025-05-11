@@ -89,7 +89,7 @@ class BlackLittermanYieldModel:
             cleaned_weights = ef.clean_weights()
             view_result = [
                 View(
-                    Weights=[{"asset": asset, "weight": 1.0}],
+                    Weights=[{"asset": asset, "weight": float(view[asset])}],
                     Return=float(ret),
                 )
                 for asset, ret in view.items()
