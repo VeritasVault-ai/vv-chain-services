@@ -78,8 +78,17 @@ class BlackLittermanYieldModel:
             # weights = ef.max_sharpe()
             cleaned_weights = ef.clean_weights()
 
-            view_result = [View(v.Weights, v.Return) for v in view]
-            allocations = [Allocation(w.index, w) for w in cleaned_weights]
+            view_result = [
+                View(
+                    Weights=[{"asset": asset, "weight": 1.0}],
+                    Return=float(ret),
+                )
+                for asset, ret in view.items()
+            ]
+            allocations = [
+                Allocation(asset, weight)
+                for asset, weight in cleaned_weights.items()
+            ]
             model_results.append(ModelResult(Views=view_result, Allocations=allocations))
 
         return BlackLittermanModelResults(
