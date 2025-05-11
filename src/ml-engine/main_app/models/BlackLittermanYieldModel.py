@@ -38,9 +38,22 @@ class BlackLittermanYieldModel:
         self.model_data = model_data
 
         self._indexes = ["{}.{}.{}".format(datum.Chain, datum.Pool, datum.Project) for datum in model_data.CryptoMarketData]
-        self._apy_data = pd.DataFrame([[metric.APY for metric in datum.Metrics] for datum in model_data.CryptoMarketData], index=self._indexes)
-        self._tvl_data = pd.DataFrame([[metric.TVL for metric in datum.Metrics] for datum in model_data.CryptoMarketData], index=self._indexes)
-
+        self._indexes = ["{}.{}.{}".format(datum.Chain, datum.Pool, datum.Project)
+                         for datum in model_data.CryptoMarketData]
+        if not self._indexes:
+            raise ValueError("No crypto market data provided")
+        
+        self._apy_data = pd.DataFrame(
+            [[metric.APY for metric in datum.Metrics] for datum in model_data.CryptoMarketData],
+            index=self._indexes,
+        )
+        self._tvl_data = pd.DataFrame(
+            [[metric.TVL for metric in datum.Metrics] for datum in model_data.CryptoMarketData],
+            index=self._indexes,
+        )
+        
+        if self._apy_data.empty or self._tvl_data.empty:
+            raise ValueError("Missing APY or TVL data")
         self.view_generator = ViewGenerator(model_data.CryptoMarketData)
 
     def calculate(self) -> BlackLittermanModelResults:
