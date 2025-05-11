@@ -62,13 +62,12 @@ class BlackLittermanYieldModel:
         tvl_data = self._tvl_data
 
         # Calculate historical returns and covariance
-        mu = expected_returns.mean_historical_return(apy_data)
         S = risk_models.sample_cov(apy_data)
 
         # Step 1: Compute equilibrium market returns (CAPM-implied)
         tvl = self._tvl_data.iloc[-1]
         tvl_series = pd.Series(tvl, index=indexes)
-        delta = market_implied_risk_aversion(tvl_data.iloc[-1])  # ~2.5–3 by default
+        delta = market_implied_risk_aversion(apy_data.iloc[-1])  # ~2.5–3 by default
         prior = delta * S @ tvl_series / tvl_series.sum()
 
         # Create uncertainty (more signal → lower variance)
