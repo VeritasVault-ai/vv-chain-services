@@ -73,9 +73,8 @@ class BlackLittermanYieldModel:
 
             # Step 4: Get portfolio weights
             ef = EfficientFrontier(bl_return, bl_cov)
-            # weights = ef.max_sharpe()
+            weights = ef.max_sharpe()  # Uncomment this or choose another optimization objective
             cleaned_weights = ef.clean_weights()
-
             view_result = [
                 View(
                     Weights=[{"asset": asset, "weight": 1.0}],
