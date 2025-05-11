@@ -3,7 +3,7 @@ from starlette.routing import Route
 from starlette.responses import JSONResponse
 from starlette.endpoints import HTTPEndpoint
 from jsonschema import validate, ValidationError
-from main_app.models.BlackLittermanYieldModel import BlackLittermanYieldModel
+# from main_app.models.BlackLittermanYieldModel import BlackLittermanYieldModel
 import json
 import uvicorn
 
