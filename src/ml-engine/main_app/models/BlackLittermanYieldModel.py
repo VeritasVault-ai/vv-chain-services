@@ -27,9 +27,11 @@ class ViewGenerator:
 
         # Combine into views
         momentum_per_view = [0.4, 0.5, 0.6]
-        views = [m * momentum + (1 - m) * valuation for m in momentum_per_view]
-        views = views / np.linalg.norm(views) * 0.05  # scale to ~5% target return
-
+        views = [
+            ((m * momentum + (1 - m) * valuation)
+             .pipe(lambda s: 0.05 * s / np.linalg.norm(s)))
+            for m in momentum_per_view
+        ]
         return views
 
 
