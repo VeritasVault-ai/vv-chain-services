@@ -3,82 +3,98 @@ from starlette.routing import Route
 from starlette.responses import JSONResponse
 from starlette.endpoints import HTTPEndpoint
 from jsonschema import validate, ValidationError
+# from main_app.models.BlackLittermanYieldModel import BlackLittermanYieldModel
 import json
 import uvicorn
+
 
 from main_app.data_classes.BlackLittermanModelData import BlackLittermanModelData
 
 class ModelEndpoint(HTTPEndpoint):
     async def post(self, request):
-        """
-        Handles HTTP POST requests to run a specified financial model with validated input data.
-        
-        Parses the incoming JSON payload, validates it against a predefined schema, and invokes the model execution. Returns a JSON response with the model results or an error message if validation or schema loading fails.
-        """
         data = await request.json()
         model_name = request.path_params['model_name']
 
-        try:
-            import os
-            schema_file = os.path.join(
-                os.path.dirname(__file__),
-                'data_classes',
-                'BlackLittermanModelDataSchema.json'
-            )
-            with open(schema_file, 'r') as file:
-                schema = json.load(file)
-        except (FileNotFoundError, json.JSONDecodeError) as e:
-            return JSONResponse({'error': f"Schema error: {str(e)}"}, status_code=500)
-
+        schema_file = 'data_classes/BlackLittermanModelDataSchema.json'
+        with open(schema_file, 'r') as file:
+            schema = json.load(file)
         try:
             validate(instance=data, schema=schema)
         except ValidationError as e:
             return JSONResponse({'error': str(e)}, status_code=400)
 
-        try:
-            result = await run_model(model_name, data)
-            return JSONResponse({'result': result})
-        except Exception as e:
-            return JSONResponse({'error': f"Model execution error: {str(e)}"}, status_code=500)
+        result = run_model(model_name, data)
+        return JSONResponse({'result': result})
+
 
 async def run_model(model_name, payload):
     # Place your model running code here
-    """
-    Runs the specified financial model asynchronously with the provided input data.
-    
-    Currently, only the "BlackLitterman" model is supported. The input payload is converted
-    to a model data instance, the model is executed asynchronously, and the results are
-    returned as a JSON-serializable object.
-    
-    Args:
-        model_name: The name of the model to run. Must be "BlackLitterman".
-        payload: A dictionary containing the input data for the model.
-    
-    Returns:
-        A JSON-serializable dictionary with the model results.
-    
-    Raises:
-        Exception: If the model_name is not "BlackLitterman".
-    """
     if model_name != 'BlackLitterman':
         raise Exception('Only BlackLitterman model is supported at present')
 
-    try:
-        model_data = BlackLittermanModelData.from_dict(payload)
-        
-        # Import and instantiate the model
-        from main_app.models.blacklittermanyieldmodel import BlackLittermanYieldModel
-        model = BlackLittermanYieldModel(model_data)
-        
-        # Run the model and get results
-        results = await model.run()
-        
-        # Return JSON serialized results
-        return results.to_json()
-    except Exception as e:
-        import logging
-        logging.error(f"Error running model: {str(e)}")
-        raise Exception(f"Failed to run {model_name} model: {str(e)}")
+    # Build model and calculate
+    # model_data = BlackLittermanModelData.from_json(payload)
+    # model = BlackLittermanYieldModel(model_data=model_data)
+    # model.calculate()
+
+    # todo For mvp, return sample portfolio. Replace with above once data has been integrated.
+    return """
+{
+  "Model": "BlackLitterman",
+  "ModelResults": [
+    {
+      "Views": [
+        {
+          "Weights": [
+            { "asset": "stETH", "weight": 1.0 },
+            { "asset": "tzBTC", "weight": -1.0 }
+          ],
+          "Return": 0.0125
+        },
+        {
+          "Weights": [
+            { "asset": "USDC", "weight": 1.0 }
+          ],
+          "Return": 0.03
+        }
+      ],
+      "Allocations": [
+        { "asset": "stETH", "weight": 0.5 },
+        { "asset": "tzBTC", "weight": 0.2 },
+        { "asset": "USDC", "weight": 0.3 }
+      ]
+    },
+    {
+      "Views": [
+        {
+          "Weights": [
+            { "asset": "stETH", "weight": 1.0 },
+            { "asset": "USDC", "weight": -1.0 }
+          ],
+          "Return": 0.02
+        },
+        {
+          "Weights": [
+            { "asset": "USDC", "weight": 1.0 }
+          ],
+          "Return": 0.02
+        },
+        {
+          "Weights": [
+            { "asset": "tzBTC", "weight": 1.0 }
+          ],
+          "Return": 0.035
+        }
+      ],
+      "Allocations": [
+        { "asset": "stETH", "weight": 0.4 },
+        { "asset": "tzBTC", "weight": 0.5 },
+        { "asset": "USDC", "weight": 0.1 }
+      ]
+    }
+  ]
+}
+"""
 
 routes = [
     Route('/run_model/{model_name}', ModelEndpoint),
