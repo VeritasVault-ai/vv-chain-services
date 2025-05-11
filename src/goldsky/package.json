@@ -23,5 +23,8 @@
   "license": "ISC",
   "devDependencies": {
     "@goldskycom/cli": "^12.0.0"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-ts": "^0.38.0"
   }
 }
