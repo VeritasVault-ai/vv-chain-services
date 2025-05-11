@@ -5,10 +5,11 @@ from typing import List
 
 @dataclass_json
 @dataclass
+@dataclass_json
+@dataclass
 class AssetWeights:
-    asset: str
-    weight: float
-
+    Asset: str  # Capitalize to match other classes
+    Weight: float
 
 @dataclass_json
 @dataclass

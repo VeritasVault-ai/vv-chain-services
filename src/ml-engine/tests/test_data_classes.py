@@ -4,6 +4,12 @@ from main_app.data_classes.BlackLittermanModelData import BlackLittermanModelDat
 
 @pytest.fixture
 def sample_json():
+    """
+    Provides a sample JSON string representing a BlackLitterman model configuration for testing.
+    
+    Returns:
+        A multi-line JSON string containing model details, risk-free rates, and crypto market data.
+    """
     return """
     {
       "Model": "BlackLitterman",

@@ -80,8 +80,7 @@
                   "description": "Total annual percentage yield as a number (e.g., 0.0523 for 5.23%)."
                 },
                 "Base APY": {
-                  "type": "string",
-                  "pattern": "^[0-9.]+%$",
+                  "type": "number",
                   "description": "Base APY percentage from the protocol, as a number (e.g., 0.05 for 5%)."
                 },
                 "Reward APY": {

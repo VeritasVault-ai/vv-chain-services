@@ -49,12 +49,15 @@
     "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",
     "cSpell.words": [
-      "fastapi",
-      "pydantic",
-      "uvicorn",
-      "pytest",
-      "dotnet",
+      "APIM",
       "azurefunctions",
+      "dotnet",
+      "fastapi",
+      "Goldsky",
+      "pydantic",
+      "pytest",
+      "Runbooks",
+      "uvicorn",
       "veritasvault"
     ]
   },
