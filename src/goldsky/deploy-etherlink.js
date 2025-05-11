@@ -15,9 +15,10 @@ try {
   // Run the deployment command
   const command = `node "${goldsky}" subgraph deploy veritasvault/etherlink-mainnet --network etherlink-mainnet --from-config subgraph.yaml`;
   console.log(`Executing: ${command}`);
-  
   const output = execSync(command, { encoding: 'utf8' });
-  console.log(output);
+  // Sanitize any sensitive information before logging
+  const sanitizedOutput = output.replace(/token=[\w-]+/g, 'token=***');
+  console.log(sanitizedOutput);
   
   console.log('EtherLink subgraph deployed successfully!');
   
