@@ -9,10 +9,8 @@ from main_app.data_classes.BlackLittermanModelResult import BlackLittermanModelR
 
 
 class ViewGenerator:
-    def __init__(self, indexes: List[str], apy_data: pd.DataFrame):
-        self._indexes = indexes
-        self._apy_data = apy_data
-
+# replace the one-argument call with the two arguments the constructor expects
+self.view_generator = ViewGenerator(self._indexes, self._apy_data)
 
     def calculate(self) -> List[pd.Series]:
         # Extract data
