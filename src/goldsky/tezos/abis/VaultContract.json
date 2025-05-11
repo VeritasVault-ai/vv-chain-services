@@ -1,0 +1,86 @@
+{
+  "entrypoints": {
+    "deposit": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": ["%from"]
+        },
+        {
+          "prim": "nat",
+          "annots": ["%amount"]
+        }
+      ]
+    },
+    "withdraw": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "address",
+          "annots": ["%to"]
+        },
+        {
+          "prim": "nat",
+          "annots": ["%amount"]
+        }
+      ]
+    },
+    "updatePrice": {
+      "prim": "pair",
+      "args": [
+        {
+          "prim": "string",
+          "annots": ["%asset"]
+        },
+        {
+          "prim": "nat",
+          "annots": ["%price"]
+        }
+      ]
+    }
+  },
+  "events": [
+    {
+      "name": "deposit",
+      "parameters": [
+        {
+          "name": "from",
+          "type": "address",
+          "indexed": true
+        },
+        {
+          "name": "amount",
+          "type": "nat"
+        }
+      ]
+    },
+    {
+      "name": "withdrawal",
+      "parameters": [
+        {
+          "name": "to",
+          "type": "address",
+          "indexed": true
+        },
+        {
+          "name": "amount",
+          "type": "nat"
+        }
+      ]
+    },
+    {
+      "name": "priceUpdate",
+      "parameters": [
+        {
+          "name": "asset",
+          "type": "string"
+        },
+        {
+          "name": "price",
+          "type": "nat"
+        }
+      ]
+    }
+  ]
+}

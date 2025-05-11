@@ -1,0 +1,30 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: VaultContract
+    network: mainnet
+    source:
+      address: "0x..."  # Replace with your actual EVM contract address
+      abi: VaultContract
+      startBlock: 1  # Adjust based on contract deployment block
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+        - Transaction
+        - PriceUpdate
+      abis:
+        - name: VaultContract
+          file: ./abis/VaultContract.json
+      eventHandlers:
+        - event: Deposit(indexed address,uint256)
+          handler: handleDeposit
+        - event: Withdrawal(indexed address,uint256)
+          handler: handleWithdrawal
+        - event: PriceUpdate(string,uint256)
+          handler: handlePriceUpdate
+      file: ./evm-mapping.ts

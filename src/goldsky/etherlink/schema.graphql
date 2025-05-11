@@ -1,0 +1,45 @@
+type Vault @entity {
+  id: ID!
+  owner: Bytes!
+  totalValue: BigInt!
+  createdAt: BigInt!
+  updatedAt: BigInt!
+  transactions: [Transaction!]! @derivedFrom(field: "vault")
+  priceUpdates: [PriceUpdate!]! @derivedFrom(field: "vault")
+  crossChainEvents: [CrossChainEvent!]! @derivedFrom(field: "vault")
+}
+
+type Transaction @entity {
+  id: ID!
+  vault: Vault!
+  from: Bytes
+  to: Bytes
+  amount: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+  blockNumber: BigInt!
+  type: String! # "deposit" or "withdrawal"
+}
+
+type PriceUpdate @entity {
+  id: ID!
+  vault: Vault!
+  asset: String!
+  price: BigInt!
+  timestamp: BigInt!
+  transactionHash: Bytes!
+  blockNumber: BigInt!
+}
+
+type CrossChainEvent @entity {
+  id: ID!
+  vault: Vault!
+  sourceChain: String!
+  destinationChain: String!
+  amount: BigInt!
+  status: String! # "initiated", "completed", "failed"
+  timestamp: BigInt!
+  transactionHash: Bytes!
+  blockNumber: BigInt!
+  metadata: String
+}
