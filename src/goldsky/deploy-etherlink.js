@@ -3,8 +3,17 @@
 const { execSync } = require('child_process');
 const path = require('path');
 
-// Get the path to the goldsky executable
-const goldsky = path.join(process.env.APPDATA, 'npm', 'node_modules', '@goldskycom', 'cli', 'bin', 'goldsky.js');
+// Get the path to the goldsky executable in a cross-platform way
+let goldsky;
+if (process.platform === 'win32') {
+  goldsky = path.join(process.env.APPDATA, 'npm', 'node_modules', '@goldskycom', 'cli', 'bin', 'goldsky.js');
+} else {
+  // For Linux/macOS, use the global node_modules path
+  goldsky = path.join(process.env.HOME, '.npm-global', 'lib', 'node_modules', '@goldskycom', 'cli', 'bin', 'goldsky.js');
+}
+
+// Alternative: Use npx which will find the binary regardless of platform
+// const goldsky = 'npx @goldskycom/cli';
 
 console.log('Deploying EtherLink subgraph...');
 
