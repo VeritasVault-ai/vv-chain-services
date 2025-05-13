@@ -3,12 +3,12 @@ from starlette.routing import Route
 from starlette.responses import JSONResponse
 from starlette.endpoints import HTTPEndpoint
 from jsonschema import validate, ValidationError
-# from main_app.models.BlackLittermanYieldModel import BlackLittermanYieldModel
+from main_app.models.BlackLittermanYieldModel import BlackLittermanYieldModel
+from main_app.data_classes.BlackLittermanModelData import BlackLittermanModelData
 import json
 import uvicorn
 
 
-from main_app.data_classes.BlackLittermanModelData import BlackLittermanModelData
 
 class ModelEndpoint(HTTPEndpoint):
     async def post(self, request):
@@ -33,68 +33,76 @@ async def run_model(model_name, payload):
         raise Exception('Only BlackLitterman model is supported at present')
 
     # Build model and calculate
-    # model_data = BlackLittermanModelData.from_json(payload)
-    # model = BlackLittermanYieldModel(model_data=model_data)
-    # model.calculate()
-
-    # todo For mvp, return sample portfolio. Replace with above once data has been integrated.
-    return """
-{
-  "Model": "BlackLitterman",
-  "ModelResults": [
+    try:
+        model_data = BlackLittermanModelData.from_json(payload)
+        model = BlackLittermanYieldModel(model_data=model_data)
+        results = model.calculate()
+        
+        return json.dumps(results)
+    except Exception as e:
+        import logging
+        logging.error(f"Error in BlackLitterman calculation: {str(e)}")
+        # For more detailed debugging, you might want to log the full traceback
+        import traceback
+        logging.debug(f"Full traceback: {traceback.format_exc()}")
+        # todo For mvp, return sample portfolio. Replace with above once data has been integrated.
+        return """
     {
-      "Views": [
+      "Model": "BlackLitterman",
+      "ModelResults": [
         {
-          "Weights": [
-            { "asset": "stETH", "weight": 1.0 },
-            { "asset": "tzBTC", "weight": -1.0 }
+          "Views": [
+            {
+              "Weights": [
+                { "asset": "stETH", "weight": 1.0 },
+                { "asset": "tzBTC", "weight": -1.0 }
+              ],
+              "Return": 0.0125
+            },
+            {
+              "Weights": [
+                { "asset": "USDC", "weight": 1.0 }
+              ],
+              "Return": 0.03
+            }
           ],
-          "Return": 0.0125
+          "Allocations": [
+            { "asset": "stETH", "weight": 0.5 },
+            { "asset": "tzBTC", "weight": 0.2 },
+            { "asset": "USDC", "weight": 0.3 }
+          ]
         },
         {
-          "Weights": [
-            { "asset": "USDC", "weight": 1.0 }
+          "Views": [
+            {
+              "Weights": [
+                { "asset": "stETH", "weight": 1.0 },
+                { "asset": "USDC", "weight": -1.0 }
+              ],
+              "Return": 0.02
+            },
+            {
+              "Weights": [
+                { "asset": "USDC", "weight": 1.0 }
+              ],
+              "Return": 0.02
+            },
+            {
+              "Weights": [
+                { "asset": "tzBTC", "weight": 1.0 }
+              ],
+              "Return": 0.035
+            }
           ],
-          "Return": 0.03
+          "Allocations": [
+            { "asset": "stETH", "weight": 0.4 },
+            { "asset": "tzBTC", "weight": 0.5 },
+            { "asset": "USDC", "weight": 0.1 }
+          ]
         }
-      ],
-      "Allocations": [
-        { "asset": "stETH", "weight": 0.5 },
-        { "asset": "tzBTC", "weight": 0.2 },
-        { "asset": "USDC", "weight": 0.3 }
-      ]
-    },
-    {
-      "Views": [
-        {
-          "Weights": [
-            { "asset": "stETH", "weight": 1.0 },
-            { "asset": "USDC", "weight": -1.0 }
-          ],
-          "Return": 0.02
-        },
-        {
-          "Weights": [
-            { "asset": "USDC", "weight": 1.0 }
-          ],
-          "Return": 0.02
-        },
-        {
-          "Weights": [
-            { "asset": "tzBTC", "weight": 1.0 }
-          ],
-          "Return": 0.035
-        }
-      ],
-      "Allocations": [
-        { "asset": "stETH", "weight": 0.4 },
-        { "asset": "tzBTC", "weight": 0.5 },
-        { "asset": "USDC", "weight": 0.1 }
       ]
     }
-  ]
-}
-"""
+    """
 
 routes = [
     Route('/run_model/{model_name}', ModelEndpoint),
