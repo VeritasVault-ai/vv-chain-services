@@ -40,8 +40,11 @@ async def run_model(model_name, payload):
         
         return json.dumps(results)
     except Exception as e:
-        print({'error': str(e)})
-
+        import logging
+        logging.error(f"Error in BlackLitterman calculation: {str(e)}")
+        # For more detailed debugging, you might want to log the full traceback
+        import traceback
+        logging.debug(f"Full traceback: {traceback.format_exc()}")
         # todo For mvp, return sample portfolio. Replace with above once data has been integrated.
         return """
     {
