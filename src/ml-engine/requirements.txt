@@ -6,6 +6,7 @@ matplotlib~=3.10.1
 pyportfolioopt~=1.5.6
 starlette~=0.46.2
 dataclasses_json~=0.6.7
+# src/ml-engine/requirements.txt (lines 8–11)
 jsonschema~=4.23.0
 pytest~=8.3.5
 dataclasses-json~=0.6.7
