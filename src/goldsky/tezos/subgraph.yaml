@@ -1,0 +1,28 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: tezos
+    name: VaultContract
+    network: mainnet
+    source:
+      address: KT1...  # Replace with your actual Tezos contract address
+    mapping:
+      kind: tezos/graph-ts
+      apiVersion: 0.1.0
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+        - Transaction
+        - PriceUpdate
+      abis:
+        - name: VaultContract
+          file: ./abis/VaultContract.json
+      eventHandlers:
+        - event: deposit(address indexed from, uint256 amount)
+          handler: handleDeposit
+        - event: withdrawal(address indexed to, uint256 amount)
+          handler: handleWithdrawal
+        - event: priceUpdate(string asset, uint256 price)
+          handler: handlePriceUpdate
+      file: ./tezos-mapping.ts
