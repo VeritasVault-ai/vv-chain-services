@@ -4,6 +4,8 @@
   "service": "devcontainer",
   "workspaceFolder": "/workspace",
   "remoteUser": "vscode",
+
+  "workspaceFile": "/workspace/vv-chain-services.code-workspace",
   
   "customizations": {
     "vscode": {
