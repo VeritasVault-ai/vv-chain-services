@@ -1,9 +1,11 @@
-FROM mcr.microsoft.com/devcontainers/dotnet:6.0
+FROM mcr.microsoft.com/devcontainers/dotnet:9.0
 
-# Install Python
-ARG PYTHON_VERSION="3.10"
+# Install Python and Git tools
+ARG PYTHON_VERSION="3.11"
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends python${PYTHON_VERSION} python${PYTHON_VERSION}-venv python3-pip \
+    && apt-get -y install --no-install-recommends \
+       python${PYTHON_VERSION} python${PYTHON_VERSION}-venv python3-pip \
+       git git-lfs \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Install Azure Functions Core Tools
