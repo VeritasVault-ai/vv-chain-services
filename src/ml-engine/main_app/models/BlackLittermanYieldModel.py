@@ -5,13 +5,16 @@ from pypfopt.black_litterman import BlackLittermanModel, market_implied_risk_ave
 from main_app.data_classes.BlackLittermanModelData import BlackLittermanModelData
 from pypfopt import risk_models, expected_returns
 from pypfopt.efficient_frontier import EfficientFrontier
-from main_app.data_classes.BlackLittermanModelResult import BlackLittermanModelResults, ModelResult, Allocation, View
+from main_app.data_classes.BlackLittermanModelResult import BlackLittermanModelResults, ModelResult, Allocation, View, \
+    AssetWeights
+from main_app.infrastructure.defi_llama import get_historic_tvl_and_apy_from_symbol
 
 
 class ViewGenerator:
     def __init__(self, indexes: List[str], apy_data: pd.DataFrame):
         self._indexes = indexes
         self._apy_data = apy_data
+
     def calculate(self) -> List[pd.Series]:
         # Extract data
         apy_data = self._apy_data
@@ -20,7 +23,8 @@ class ViewGenerator:
         mu = expected_returns.mean_historical_return(apy_data)
 
         # Step 2: Create non-ML views (simple momentum + valuation signals)
-        momentum = apy_data.pct_change(90).iloc[-1]  # 3-month momentum
+        period = 30
+        momentum = apy_data.iloc[0] / apy_data.iloc[period] - 1 # 1-month momentum
         valuation = 1 / mu  # crude valuation proxy: inverse historical return
 
         # Combine into views
@@ -37,24 +41,41 @@ class BlackLittermanYieldModel:
     def __init__(self, model_data: BlackLittermanModelData):
         self.model_data = model_data
 
-        self._indexes = ["{}.{}.{}".format(datum.Chain, datum.Pool, datum.Project) for datum in model_data.CryptoMarketData]
-        self._indexes = ["{}.{}.{}".format(datum.Chain, datum.Pool, datum.Project)
-                         for datum in model_data.CryptoMarketData]
+        self._indexes = [datum.Symbol.upper() for datum in model_data.CryptoMarketData]
         if not self._indexes:
             raise ValueError("No crypto market data provided")
-        
-        self._apy_data = pd.DataFrame(
-            [[metric.APY for metric in datum.Metrics] for datum in model_data.CryptoMarketData],
-            index=self._indexes,
-        )
-        self._tvl_data = pd.DataFrame(
-            [[metric.TVL for metric in datum.Metrics] for datum in model_data.CryptoMarketData],
-            index=self._indexes,
-        )
-        
+
+        # If we have been passed market data, use it, else retrieve.
+        # The assumption is that if we haven't been passed market data for the first asset then we don't have for the
+        # rest. todo make clear in interface / amend implementation
+        if model_data.CryptoMarketData[0].Metrics is not None and len(model_data.CryptoMarketData[0].Metrics) != 0:
+            raise Exception("Custom market data not supported at present")
+        else:
+            self._apy_data = pd.DataFrame()
+            self._tvl_data = pd.DataFrame()
+            
+            for symbol in self._indexes:
+                df = get_historic_tvl_and_apy_from_symbol(symbol)
+                
+                # we only use the last value each day for model purposes to reduce noise
+                df["timestamp"] = pd.to_datetime(df["timestamp"]).dt.date
+                df = df.groupby("timestamp").last()
+
+                # Sort by descending date and only include the last 365 days
+                df = df.sort_index(ascending=False)
+                df = df.iloc[:365]
+
+                self._apy_data[symbol] = df["apy"] / 100
+                self._tvl_data[symbol] = df["tvlUsd"]
+
+            
+            self._apy_data.fillna(method="bfill", inplace=True)
+            self._tvl_data.fillna(method="bfill", inplace=True)
+
         if self._apy_data.empty or self._tvl_data.empty:
             raise ValueError("Missing APY or TVL data")
-        self.view_generator = ViewGenerator(model_data.CryptoMarketData)
+
+        self.view_generator = ViewGenerator(self._indexes, self._apy_data)
 
     def calculate(self) -> BlackLittermanModelResults:
         indexes = self._indexes
@@ -65,9 +86,9 @@ class BlackLittermanYieldModel:
         S = risk_models.sample_cov(apy_data)
 
         # Step 1: Compute equilibrium market returns (CAPM-implied)
-        tvl = self._tvl_data.iloc[-1]
+        tvl = tvl_data.iloc[0]
         tvl_series = pd.Series(tvl, index=indexes)
-        delta = market_implied_risk_aversion(apy_data.iloc[-1])  # ~2.5–3 by default
+        delta = market_implied_risk_aversion(apy_data.iloc[0])  # ~2.5–3 by default
         prior = delta * S @ tvl_series / tvl_series.sum()
 
         # Create uncertainty (more signal → lower variance)
@@ -89,7 +110,7 @@ class BlackLittermanYieldModel:
             cleaned_weights = ef.clean_weights()
             view_result = [
                 View(
-                    Weights=[{"asset": asset, "weight": float(view[asset])}],
+                    Weights=[AssetWeights(str(asset), float(view[asset]))],
                     Return=float(ret),
                 )
                 for asset, ret in view.items()

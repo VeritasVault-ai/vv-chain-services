@@ -20,7 +20,7 @@ class RiskFreeRate:
 @dataclass_json
 @dataclass
 class Metrics:
-    Date: str
+    Timestamp: str
     TVL: float
     APY: float
     Base_APY: Optional[float] = field(default=None)
@@ -30,10 +30,11 @@ class Metrics:
 @dataclass_json
 @dataclass
 class CryptoMarketData:
-    Pool: str
-    Project: str
-    Chain: str
-    Metrics: List[Metrics]
+    Pool: Optional[str]
+    Project: Optional[str]
+    Chain: Optional[str]
+    Symbol: Optional[str]
+    Metrics: Optional[List[Metrics]] = field(default=None)
 
 
 @dataclass_json

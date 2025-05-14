@@ -1,0 +1,56 @@
+@host = localhost:8000
+
+### Get TVL/APY data
+GET {{host}}/market_data/metrics/defillama/tvl_and_apy/tzbtc
+Content-Type: application/json
+
+###
+
+POST {{host}}/run_model/blacklitterman
+Content-Type: application/json
+
+{
+  "Model": "BlackLitterman",
+  "ModelParameters": {
+    "RiskAversion": 2.5,
+    "UncertaintyInPrior": 0.05
+  },
+  "RiskFreeRates": [
+    {
+      "term": "1Y",
+      "rate": 0.0175
+    }
+  ],
+  "CryptoMarketData": [
+    {
+      "Symbol": "stETH",
+      "Pool": "STETH Pool",
+      "Project": "Lido",
+      "Chain": "Ethereum"
+    },
+    {
+      "Symbol": "GHO",
+      "Pool": "GHO Pool",
+      "Project": "Aave",
+      "Chain": "Ethereum"
+    },
+    {
+      "Symbol": "USDC",
+      "Pool": "USDC Pool",
+      "Project": "Circle",
+      "Chain": "Ethereum"
+    },
+    {
+      "Symbol": "WBTC",
+      "Pool": "WBTC Pool",
+      "Project": "BitGo",
+      "Chain": "Ethereum"
+    },
+    {
+      "Symbol": "JITOSOL",
+      "Pool": "JitoSOL Pool",
+      "Project": "Jito",
+      "Chain": "Solana"
+    }
+  ]
+}
