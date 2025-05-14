@@ -1,33 +1,46 @@
-FROM mcr.microsoft.com/devcontainers/dotnet:9.0
+FROM mcr.microsoft.com/devcontainers/dotnet:8.0
 
-# Install Python and Git tools
-ARG PYTHON_VERSION="3.11"
+# 1) Install Python and venv support
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends \
-       python${PYTHON_VERSION} python${PYTHON_VERSION}-venv python3-pip \
-       git git-lfs \
-    && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y --no-install-recommends \
+         curl lsb-release gnupg software-properties-common \
+         python3.11 python3.11-venv \
+         git git-lfs \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Azure Functions Core Tools
+# 2) Create a global venv at /opt/venv and bootstrap pip
+RUN python3.11 -m venv /opt/venv \
+    && /opt/venv/bin/pip install --upgrade pip setuptools wheel
+
+# 3) Make that venv the default python/pip
+ENV PATH="/opt/venv/bin:${PATH}"
+
+# Install Azure CLI and Azure Functions Core Tools (Ubuntu 22.04)
 RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
-    && apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends azure-functions-core-tools-4 \
+    && curl https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -o packages-microsoft-prod.deb \
+    && dpkg -i packages-microsoft-prod.deb \
+    && rm packages-microsoft-prod.deb \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends azure-functions-core-tools-4 \
     && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
-# Install Python development tools
-RUN pip3 install pylint black pytest fastapi uvicorn[standard] httpx
+# vscode user setup
+RUN mkdir -p /home/vscode/.dotnet/tools \
+    && mkdir -p /home/vscode/.local \
+    && chown -R vscode:vscode /home/vscode/.dotnet /home/vscode/.local
 
-# Install .NET tools
-RUN dotnet tool install -g dotnet-ef
-RUN dotnet tool install -g Microsoft.dotnet-httprepl
+# Switch to vscode user to install Poetry and .NET tools
+USER vscode
 
-# Set up a non-root user
-ARG USERNAME=vscode
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
+# Configure PATH for vscode user
+ENV PATH="${PATH}:/home/vscode/.dotnet/tools:/home/vscode/.local/bin"
 
-# Add dotnet tools to PATH
-ENV PATH $PATH:/home/$USERNAME/.dotnet/tools
+# Install .NET global tools
+RUN dotnet tool install -g dotnet-ef \
+    && dotnet tool install -g Microsoft.dotnet-httprepl
 
-# [Optional] Set the default user. Omit if you want to keep the default as root.
-USER $USERNAME
+# Install Poetry (as vscode user)
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Configure Poetry to use system Python (no separate virtualenv in Docker)
+RUN poetry config virtualenvs.create false
