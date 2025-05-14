@@ -32,6 +32,9 @@
     }
   },
   "forwardPorts": [7071, 8000, 6379],
-  "postCreateCommand": "./startup.sh",
+  "remoteEnv": {
+    "GIT_CONFIG_GLOBAL": "/workspace/.gitconfig_global"
+  },
+  "postCreateCommand": "touch /workspace/.gitconfig_global && ./startup.sh",
   "remoteUser": "vscode"
 }
