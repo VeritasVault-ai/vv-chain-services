@@ -1,11 +1,12 @@
 from typing import List
 import numpy as np
 import pandas as pd
+from scipy.stats import zscore
 from pypfopt.black_litterman import BlackLittermanModel, market_implied_risk_aversion
 from main_app.data_classes.BlackLittermanModelData import BlackLittermanModelData
 from pypfopt import risk_models, expected_returns
 from pypfopt.efficient_frontier import EfficientFrontier
-from main_app.data_classes.BlackLittermanModelResult import BlackLittermanModelResults, ModelResult, Allocation, View, \
+from main_app.data_classes.BlackLittermanModelResults import BlackLittermanModelResults, ModelResult, Allocation, View, \
     AssetWeights
 from main_app.infrastructure.defi_llama import get_historic_tvl_and_apy_from_symbol
 
@@ -23,12 +24,17 @@ class ViewGenerator:
         mu = expected_returns.mean_historical_return(apy_data)
 
         # Step 2: Create non-ML views (simple momentum + valuation signals)
+        k_momentum = 1.0  # Scale for momentum-based return (use 1.0 if annualized return is in %)
+        k_valuation = 0.03  # Scale for valuation z-score to return
+        w_momentum = 0.5  # Weight on momentum view
+        w_valuation = 0.5  # Weight on valuation view
+
         period = 30
-        momentum = apy_data.iloc[0] / apy_data.iloc[period] - 1 # 1-month momentum
-        valuation = 1 / mu  # crude valuation proxy: inverse historical return
+        momentum = 2 * (apy_data.iloc[0] / apy_data.iloc[period] - 1) * 365 / period # 1-month momentum
+        valuation = 0.03 / mu  # crude valuation proxy: inverse historical return
 
         # Combine into views
-        momentum_per_view = [0.4, 0.5, 0.6]
+        momentum_per_view = [0.25, 0.5, 0.75]
         views = [
             ((m * momentum + (1 - m) * valuation)
              .pipe(lambda s: 0.05 * s / np.linalg.norm(s)))

@@ -24,7 +24,9 @@ class ModelEndpoint(HTTPEndpoint):
             return JSONResponse({'error': str(e)}, status_code=400)
 
         result = self.run_model(model_name, data)
-        return JSONResponse({'result': result})
+        response = result.to_json()
+
+        return JSONResponse(response)
 
 
     def run_model(self, model_name, payload):
@@ -35,66 +37,10 @@ class ModelEndpoint(HTTPEndpoint):
         json_payload = json.dumps(payload)
         model_data = BlackLittermanModelData.from_json(json_payload)
         model = BlackLittermanYieldModel(model_data=model_data)
-        model.calculate()
+        result = model.calculate()
 
-        # todo For mvp, return sample portfolio. Replace with above once data has been integrated.
-        return """
-    {
-      "Model": "BlackLitterman",
-      "ModelResults": [
-        {
-          "Views": [
-            {
-              "Weights": [
-                { "asset": "stETH", "weight": 1.0 },
-                { "asset": "tzBTC", "weight": -1.0 }
-              ],
-              "Return": 0.0125
-            },
-            {
-              "Weights": [
-                { "asset": "USDC", "weight": 1.0 }
-              ],
-              "Return": 0.03
-            }
-          ],
-          "Allocations": [
-            { "asset": "stETH", "weight": 0.5 },
-            { "asset": "tzBTC", "weight": 0.2 },
-            { "asset": "USDC", "weight": 0.3 }
-          ]
-        },
-        {
-          "Views": [
-            {
-              "Weights": [
-                { "asset": "stETH", "weight": 1.0 },
-                { "asset": "USDC", "weight": -1.0 }
-              ],
-              "Return": 0.02
-            },
-            {
-              "Weights": [
-                { "asset": "USDC", "weight": 1.0 }
-              ],
-              "Return": 0.02
-            },
-            {
-              "Weights": [
-                { "asset": "tzBTC", "weight": 1.0 }
-              ],
-              "Return": 0.035
-            }
-          ],
-          "Allocations": [
-            { "asset": "stETH", "weight": 0.4 },
-            { "asset": "tzBTC", "weight": 0.5 },
-            { "asset": "USDC", "weight": 0.1 }
-          ]
-        }
-      ]
-    }
-    """
+        return result
+
 
 class MarketDataEndpoint(HTTPEndpoint):
     async def get(self, request):
