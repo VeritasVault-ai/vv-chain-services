@@ -1,0 +1,27 @@
+{
+  "name": "goldsky",
+  "version": "1.0.0",
+  "description": "Goldsky provides the primary blockchain data ingestion layer for the VeritasVault.ai platform, enabling real-time event monitoring across multiple chains. This guide covers the setup and configuration of Goldsky subgraphs for Tezos, EVM chains, and EtherLink.",
+  "main": "deploy-etherlink.js",
+  "scripts": {
+    "login": "npx @goldskycom/cli login",
+    "deploy:etherlink": "cd etherlink && npx @goldskycom/cli subgraph deploy veritasvault/etherlink-mainnet --network etherlink-mainnet --from-config subgraph.yaml",
+    "deploy:tezos": "cd tezos && npx @goldskycom/cli subgraph deploy veritasvault/tezos-mainnet --network tezos-mainnet --from-config subgraph.yaml",
+    "deploy:evm": "cd evm && npx @goldskycom/cli subgraph deploy veritasvault/evm-mainnet --network ethereum --from-config subgraph.yaml",
+    "webhook:etherlink": "npx @goldskycom/cli subgraph webhook create veritasvault/etherlink-mainnet --endpoint https://veritasvault-eventgrid.azure-api.net/api/events --secret $WEBHOOK_API_KEY",
+    "webhook:tezos": "npx @goldskycom/cli subgraph webhook create veritasvault/tezos-mainnet --endpoint https://veritasvault-eventgrid.azure-api.net/api/events --secret $WEBHOOK_API_KEY",
+    "webhook:evm": "npx @goldskycom/cli subgraph webhook create veritasvault/evm-mainnet --endpoint https://veritasvault-eventgrid.azure-api.net/api/events --secret $WEBHOOK_API_KEY",
+    "status:etherlink": "npx @goldskycom/cli subgraph status veritasvault/etherlink-mainnet",
+    "status:tezos": "npx @goldskycom/cli subgraph status veritasvault/tezos-mainnet",
+    "status:evm": "npx @goldskycom/cli subgraph status veritasvault/evm-mainnet",
+    "logs:etherlink": "npx @goldskycom/cli subgraph logs veritasvault/etherlink-mainnet",
+    "logs:tezos": "npx @goldskycom/cli subgraph logs veritasvault/tezos-mainnet",
+    "logs:evm": "npx @goldskycom/cli subgraph logs veritasvault/evm-mainnet"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@goldskycom/cli": "^12.0.0"
+  }
+}
