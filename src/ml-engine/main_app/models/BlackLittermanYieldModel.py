@@ -24,14 +24,13 @@ class ViewGenerator:
         mu = expected_returns.mean_historical_return(apy_data)
 
         # Step 2: Create non-ML views (simple momentum + valuation signals)
-        k_momentum = 1.0  # Scale for momentum-based return (use 1.0 if annualized return is in %)
-        k_valuation = 0.03  # Scale for valuation z-score to return
-        w_momentum = 0.5  # Weight on momentum view
-        w_valuation = 0.5  # Weight on valuation view
+        period = min(30, len(apy_data) - 1)
+        if period <= 0:
+            raise ValueError("Not enough history to compute momentum view")
 
-        period = 30
         momentum = 2 * (apy_data.iloc[0] / apy_data.iloc[period] - 1) * 365 / period # 1-month momentum
-        valuation = 0.03 / mu  # crude valuation proxy: inverse historical return
+        safe_mu = mu.replace(0, np.nan)
+        valuation = 0.03 / safe_mu.fillna(safe_mu.mean())  # crude valuation proxy: inverse historical return
 
         # Combine into views
         momentum_per_view = [0.25, 0.5, 0.75]
@@ -48,6 +47,7 @@ class BlackLittermanYieldModel:
         self.model_data = model_data
 
         self._indexes = [datum.Symbol.upper() for datum in model_data.CryptoMarketData]
+
         if not self._indexes:
             raise ValueError("No crypto market data provided")
 
@@ -59,7 +59,7 @@ class BlackLittermanYieldModel:
         else:
             self._apy_data = pd.DataFrame()
             self._tvl_data = pd.DataFrame()
-            
+
             for symbol in self._indexes:
                 df = get_historic_tvl_and_apy_from_symbol(symbol)
                 

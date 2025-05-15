@@ -1,11 +1,10 @@
 @host = localhost:8000
 
 ### Get TVL/APY data
-GET {{host}}/market_data/metrics/defillama/tvl_and_apy/tzbtc
+GET {{host}}/market_data/metrics/defillama/tvl_and_apy/steth
 Content-Type: application/json
 
 ###
-
 POST {{host}}/run_model/blacklitterman
 Content-Type: application/json
 
