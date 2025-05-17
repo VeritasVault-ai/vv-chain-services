@@ -1,0 +1,36 @@
+name: Goldsky Deployment
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "src/**"
+      - "function-apps/**"
+      - ".github/workflows/goldsky-deploy.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy-goldsky:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+          cache: "npm"
+
+      - name: Install Goldsky CLI
+        run: npm install -g @goldsky/cli
+
+      - name: Configure Goldsky
+        run: |
+          echo "${{ secrets.GOLDSKY_AUTH_CONFIG }}" > ~/.goldsky/auth.json
+        shell: bash
+
+      - name: Deploy to Goldsky
+        run: goldsky deploy
+        env:
+          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
