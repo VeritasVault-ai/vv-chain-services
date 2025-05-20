@@ -5,20 +5,21 @@ from typing import List
 
 @dataclass_json
 @dataclass
-class AssetWeights:
-    Asset: str  # Capitalize to match other classes
-    Weight: float
+class AssetViewResult:
+    Asset: List[str]
+    Weights: List[float]
 
 @dataclass_json
 @dataclass
-class View:
-    Weights: List[AssetWeights]
+class ViewResult:
+    Weights: List[AssetViewResult]
+    Confidence: float
     Return: float
 
 
 @dataclass_json
 @dataclass
-class Allocation:
+class AllocationResult:
     asset: str
     weight: float
 
@@ -26,12 +27,13 @@ class Allocation:
 @dataclass_json
 @dataclass
 class ModelResult:
-    Views: List[View]
-    Allocations: List[Allocation]
+    Views: List[ViewResult]
+    Allocations: List[AllocationResult]
 
 
 @dataclass_json
 @dataclass
 class BlackLittermanModelResults:
     Model: str
+    Submodel: str
     ModelResults: List[ModelResult]

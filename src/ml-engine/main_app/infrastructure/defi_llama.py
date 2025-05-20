@@ -46,11 +46,12 @@ def get_historic_tvl_and_apy_from_symbol(symbol):
                     "JITOSOL": "0e7d0722-9054-4907-8593-567b353c0900"
                 }
 
-    if symbol not in pool_map:
+    normalized_symbol = symbol.upper()
+    if normalized_symbol not in pool_map:
         raise ValueError(
-            f"Symbol '{symbol}' not found in pool mapping. Available symbols: {', '.join(pool_map.keys())}")
+            f"Symbol '{symbol}' not found in pool mapping. Available symbols: " + ', '.join(pool_map.keys()))
 
-    return get_historic_tvl_and_apy_from_pool_id(pool_map[symbol])
+    return get_historic_tvl_and_apy_from_pool_id(pool_map[normalized_symbol])
 
 
 

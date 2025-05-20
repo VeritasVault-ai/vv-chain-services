@@ -29,18 +29,28 @@ class Metrics:
 
 @dataclass_json
 @dataclass
-class CryptoMarketData:
+class AssetStaticData:
     Pool: Optional[str]
     Project: Optional[str]
     Chain: Optional[str]
-    Symbol: Optional[str]
-    Metrics: Optional[List[Metrics]] = field(default=None)
+    Symbol: str
+
+@dataclass_json
+@dataclass
+class ExplicitReturnView:
+    Symbols: List[str]
+    Weights: List[float]
+    ExpectedReturn: float
+    Confidence: float
 
 
 @dataclass_json
 @dataclass
 class BlackLittermanModelData:
     Model: str
+    Submodel: str
+    AssetSymbols: List[str]
     ModelParameters: ModelParameters
-    RiskFreeRates: List[RiskFreeRate]
-    CryptoMarketData: List[CryptoMarketData]
+    RiskFreeRates: Optional[List[RiskFreeRate]]
+    PortfolioViews: Optional[List[ExplicitReturnView]]
+    AssetStaticData: List[AssetStaticData] = field(default=None)
