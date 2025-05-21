@@ -47,6 +47,23 @@ def get_headers():
         headers["X-CG-Pro-API-Key"] = COINGECKO_API_KEY
     return headers
 
+
+def respect_rate_limits(response):
+    """Check response headers and respect rate limits"""
+    remaining = response.headers.get('X-RateLimit-Remaining')
+    if remaining and int(remaining) < 5:
+        reset_time = response.headers.get('X-RateLimit-Reset')
+        if reset_time:
+            sleep_time = max(int(reset_time) - time.time(), 0) + 1
+            logger.info(f"Rate limit approaching, sleeping for {sleep_time} seconds")
+            time.sleep(sleep_time)
+        else:
+            logger.info("Rate limit approaching, sleeping for 10 seconds")
+            time.sleep(10)
+    else:
+        # Add a small delay between requests regardless
+        time.sleep(0.5)
+
 def fetch_coins_list():
     """
     Fetches the complete list of coins from the CoinGecko API and saves it to a local JSON file.
