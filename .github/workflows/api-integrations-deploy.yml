@@ -41,8 +41,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
-          npx @goldsky/cli login
+      - name: Install dependencies
+        run: |
           npm ci
           npx @goldsky/cli login
           pip install -r src/ml-engine/requirements.txt requests
