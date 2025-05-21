@@ -37,13 +37,11 @@ DATA_DIR = os.path.join(
 )
 
 def get_headers():
-    """Get headers for API requests, including authentication if API key is available.
-
-    Authentication increases rate limits and enables access to premium features.
-    Set DEFILLAMA_API_KEY environment variable to enable authentication.
-
-    Returns:
-        dict: Headers with content-type and optional authentication token."""
+    """
+    Returns HTTP headers for DefiLlama API requests, including authentication if an API key is set.
+    
+    If the DEFILLAMA_API_KEY environment variable is present, adds a bearer token for authenticated requests.
+    """
     headers = {
         "Accept": "application/json"
     }
@@ -179,15 +177,18 @@ def fetch_chains():
         logger.exception("Unexpected error while fetching chains data")
         return None
 
-def update_metadata():
-    """Update metadata file with timestamp and version info"""
+
+
     metadata = {
         "last_updated": datetime.utcnow().isoformat(),
         "version": API_VERSION,
-        "api_base": DEFILLAMA_API_BASE
-    }
+        "api_base": DEFILLAMA_API_BASE.
+        "output_file" = os.path.join(DATA_DIR, "metadata.json")
+    """
+    Creates or updates the metadata.json file with the current timestamp, version, and API base URL.
     
-    output_file = os.path.join(DATA_DIR, "metadata.json")
+    The metadata file is saved in the data directory with user read/write permissions.
+    """
     try:
         with open(output_file, "w") as f:
             json.dump(metadata, f, indent=JSON_INDENT)
@@ -197,7 +198,11 @@ def update_metadata():
         logger.exception(f"Failed to write metadata to {output_file}")
 
 def main():
-    """Main function to update all DefiLlama data"""
+    """
+    Coordinates the full DefiLlama data update process, including data fetching and metadata refresh.
+    
+    Creates the data directory if needed, retrieves protocols, TVL, and chains data from the DefiLlama API, saves them locally, updates metadata, and logs progress. Exits with an error if any data fetch fails.
+    """
     logger.info("Starting DefiLlama integration update")
     start_time = time.time()
     
