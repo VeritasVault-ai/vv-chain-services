@@ -83,6 +83,7 @@ def fetch_coins_list():
         output_file = os.path.join(DATA_DIR, "coins_list.json")
         with open(output_file, "w") as f:
             json.dump(coins, f, indent=JSON_INDENT)
+        os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
 
         logger.info(f"Saved {len(coins)} coins to {output_file}")
         return coins
