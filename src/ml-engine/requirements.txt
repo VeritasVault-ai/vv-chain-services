@@ -10,3 +10,5 @@ dataclasses_json~=0.6.7
 jsonschema~=4.23.0
 pytest~=8.3.5
 dataclasses-json~=0.6.7
+requests>=2.32.2 # not directly required, pinned by Snyk to avoid a vulnerability
+urllib3>=2.2.2 # not directly required, pinned by Snyk to avoid a vulnerability
