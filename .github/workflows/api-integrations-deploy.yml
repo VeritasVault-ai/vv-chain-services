@@ -41,7 +41,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install -g @goldsky/cli
+          npm ci
+          npx @goldsky/cli login
           pip install -r src/ml-engine/requirements.txt
           pip install requests pandas
 
