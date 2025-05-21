@@ -96,7 +96,7 @@ def fetch_tvl_data():
     logger.info(f"Fetching TVL data from {url}")
     
     try:
-        response = requests.get(url, headers=get_headers())
+        response = requests.get(url, headers=get_headers(), timeout=30)
         response.raise_for_status()
         tvl_data = response.json()
         
