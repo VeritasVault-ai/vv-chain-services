@@ -153,6 +153,8 @@ def update_metadata():
     output_file = os.path.join(DATA_DIR, "metadata.json")
     with open(output_file, "w") as f:
         json.dump(metadata, f, indent=2)
+    import stat  # Add this import at the top if not already present
+    os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
     
     logger.info(f"Updated metadata at {output_file}")
 
