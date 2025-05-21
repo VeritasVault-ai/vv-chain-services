@@ -9,6 +9,20 @@ import { BigInt, Bytes, ethereum, Address } from '@graphprotocol/graph-ts';
 
  // Constants
  const DEFAULT_TOTAL_VALUE = 0;
+/**
+ * Helper function to get an existing vault or create a new one with default values.
+ */
+function getOrCreateVault(id: string, owner: Bytes, timestamp: BigInt): Vault {
+  let vault = Vault.load(id);
+  if (!vault) {
+    vault = new Vault(id);
+    vault.owner = owner;
+    vault.totalValue = BigInt.fromI32(DEFAULT_TOTAL_VALUE);
+    vault.createdAt = timestamp;
+    vault.updatedAt = timestamp;
+  }
+  return vault;
+}
 
 /**
  * Handles a deposit event by updating the corresponding vault's total value and recording the deposit transaction.
@@ -20,15 +34,8 @@ export function handleDeposit(event: DepositEvent): void {
   let vaultId = event.params.from.toHexString();
   let amount = event.params.amount;
   
-  // Load or create vault
-  let vault = Vault.load(vaultId);
-  if (!vault) {
-    vault = new Vault(vaultId);
-    vault.owner = event.params.from;
-    vault.totalValue = BigInt.fromI32(DEFAULT_TOTAL_VALUE);
-    vault.createdAt = event.block.timestamp;
-    vault.updatedAt = event.block.timestamp;
-  }
+  // Get or create vault
+  let vault = getOrCreateVault(vaultId, event.params.from, event.block.timestamp);
   
   // Update vault data
   vault.totalValue = vault.totalValue.plus(amount);
@@ -61,14 +68,8 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
   let vaultId = event.params.to.toHexString();
   let amount = event.params.amount;
   
-  // Load or create vault
-  let vault = Vault.load(vaultId);
-  if (!vault) {
-    vault = new Vault(vaultId);
-    vault.owner = event.params.to;
-    vault.totalValue = BigInt.fromI32(DEFAULT_TOTAL_VALUE);
-    vault.createdAt = event.block.timestamp;
-  }
+  // Get or create vault
+  let vault = getOrCreateVault(vaultId, event.params.to, event.block.timestamp);
   
   // Withdrawal: ensure we don't go negative
   if (vault.totalValue.ge(event.params.amount)) {
@@ -105,16 +106,10 @@ export function handlePriceUpdate(event: PriceUpdateEvent): void {
   let asset = event.params.asset;
   let price = event.params.price;
   
-  // Load or create vault
-  let vault = Vault.load(vaultId);
-  if (!vault) {
-    vault = new Vault(vaultId);
-    vault.owner = event.transaction.from;
-    vault.totalValue = BigInt.fromI32(DEFAULT_TOTAL_VALUE);
-    vault.createdAt = event.block.timestamp;
-    vault.updatedAt = event.block.timestamp;
-    vault.save();
-  }
+  // Get or create vault
+  let vault = getOrCreateVault(vaultId, event.transaction.from, event.block.timestamp);
+  vault.updatedAt = event.block.timestamp;
+  vault.save();
   
   // Create price update record
   let priceUpdateId = event.transaction.hash.toHexString() + '-' + event.logIndex.toString();
