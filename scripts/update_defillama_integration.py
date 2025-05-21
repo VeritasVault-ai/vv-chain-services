@@ -95,13 +95,10 @@ def fetch_tvl_data():
 
         # Save to file
         output_file = os.path.join(DATA_DIR, "tvl.json")
-        try:
-            with open(output_file, "w") as f:
-                json.dump(tvl_data, f, indent=JSON_INDENT)
-            os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
-        except IOError as e:
-            logger.exception(f"Failed to write TVL data to {output_file}")
-            return None
+
+        with open(output_file, "w") as f:
+            json.dump(tvl_data, f, indent=JSON_INDENT)
+        os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
 
         logger.info(f"Saved TVL data to {output_file}")
         return tvl_data
@@ -147,6 +144,7 @@ def fetch_chains():
         logger.exception("Unexpected error while fetching chains data")
         return None
 
+def update_metadata():
     metadata = {
         "last_updated": datetime.utcnow().isoformat(),
         "version": API_VERSION,
