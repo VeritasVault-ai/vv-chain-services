@@ -1,4 +1,4 @@
-import { BigInt, Address, Bytes, ethereum } from '@graphprotocol/graph-ts';
+import { BigInt, Address, ethereum } from '@graphprotocol/graph-ts';
 
 // Event parameter interfaces
 export class DepositParams {
