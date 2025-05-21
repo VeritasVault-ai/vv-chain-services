@@ -75,6 +75,7 @@ def fetch_global_data():
     try:
         response = requests.get(url, headers=get_headers())
         response.raise_for_status()
+        respect_rate_limits(response)
         global_data = response.json()
         
         # Save to file
@@ -85,7 +86,12 @@ def fetch_global_data():
         logger.info(f"Saved global market data to {output_file}")
         return global_data
     except Exception as e:
-        logger.error(f"Error fetching global market data: {e}")
+        logger.error(
+            f"Error fetching global market data: {str(e)}, "
+            f"Status Code: {e.response.status_code if hasattr(e, 'response') else 'N/A'}, "
+            f"Response: {e.response.text if hasattr(e, 'response') else 'N/A'}, "
+            f"URL: {url}"
+        )
         return None
 
 def fetch_top_coins(limit=250):
