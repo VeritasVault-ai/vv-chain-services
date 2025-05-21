@@ -43,8 +43,9 @@ jobs:
         run: |
           npm ci
           npx @goldsky/cli login
-          pip install -r src/ml-engine/requirements.txt
-          pip install requests pandas
+          npm ci
+          npx @goldsky/cli login
+          pip install -r src/ml-engine/requirements.txt requests
 
       # Goldsky Deployment
       - name: Configure Goldsky
