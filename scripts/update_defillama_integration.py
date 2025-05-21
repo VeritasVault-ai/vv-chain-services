@@ -128,8 +128,17 @@ def fetch_chains():
         
         logger.info(f"Saved chains data to {output_file}")
         return chains_data
+    except requests.exceptions.RequestException as e:
+        logger.exception("Network error while fetching chains data")
+        return None
+    except json.JSONDecodeError as e:
+        logger.exception("Failed to decode JSON response from chains API")
+        return None
+    except IOError as e:
+        logger.exception(f"Failed to write chains data to {output_file}")
+        return None
     except Exception as e:
-        logger.error(f"Error fetching chains data: {e}")
+        logger.exception("Unexpected error while fetching chains data")
         return None
 
 def update_metadata():
