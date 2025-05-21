@@ -86,9 +86,7 @@ export class Transaction extends Entity {
   }
 
   set to(value: Bytes | null) {
-    if (value) {
-      this.set("to", value);
-    }
+    this.set("to", value);
   }
 
   get to(): Bytes | null {
