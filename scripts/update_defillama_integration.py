@@ -125,7 +125,8 @@ def fetch_chains():
         output_file = os.path.join(DATA_DIR, "chains.json")
         with open(output_file, "w") as f:
             json.dump(chains_data, f, indent=JSON_INDENT)
-
+        os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
+        
         logger.info(f"Saved chains data to {output_file}")
         return chains_data
     except requests.exceptions.RequestException:
