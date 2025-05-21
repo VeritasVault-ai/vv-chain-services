@@ -90,5 +90,5 @@ jobs:
           SLACK_CHANNEL: deployments
           SLACK_COLOR: ${{ job.status }}
           SLACK_TITLE: API Integrations Deployment
-          SLACK_MESSAGE: 'API Integrations deployed successfully!'
+          SLACK_MESSAGE: 'API Integrations deployment ${{ job.status }} (Target: ${{ github.event.inputs.deploy_target || 'all' }})'
           SLACK_FOOTER: 'Veritas Vault Chain Services'
