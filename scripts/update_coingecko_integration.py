@@ -52,6 +52,7 @@ def fetch_coins_list():
                 f"Response: {e.response.text if hasattr(e, 'response') else 'N/A'}, "
                 f"URL: {url}"
             )
+            respect_rate_limits(response)
             raise
         coins = response.json()
         
