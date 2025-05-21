@@ -31,6 +31,21 @@ jobs:
         shell: bash
 
       - name: Deploy to Goldsky
-        run: goldsky deploy
+        run: |
+          set -eo pipefail
+          echo "Starting Goldsky deployment..."
+          deployment_output=$(mktemp)
+          if goldsky deploy | tee $deployment_output; then
+            echo "Deployment command executed successfully"
+            if grep -q "Deployment completed successfully" $deployment_output; then
+              echo "✅ Deployment verified successful"
+            else
+              echo "⚠️ Deployment completed without expected success message"
+              exit 1
+            fi
+          else
+            echo "❌ Deployment failed"
+            exit 1
+          fi
         env:
           GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
