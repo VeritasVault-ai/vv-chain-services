@@ -19,11 +19,17 @@ export class PriceUpdateParams {
 }
 
 // Event interfaces
+
 export class Deposit extends ethereum.Event {
   params: DepositParams;
 
-  constructor(params: DepositParams) {
-    super();
+  constructor(
+    address: Address,
+    logIndex: BigInt,
+    transactionLogIndex: BigInt,
+    params: DepositParams
+  ) {
+    super(address, logIndex, transactionLogIndex);
     this.params = params;
   }
 }
@@ -31,8 +37,13 @@ export class Deposit extends ethereum.Event {
 export class Withdrawal extends ethereum.Event {
   params: WithdrawalParams;
 
-  constructor(params: WithdrawalParams) {
-    super();
+  constructor(
+    address: Address,
+    logIndex: BigInt,
+    transactionLogIndex: BigInt,
+    params: WithdrawalParams
+  ) {
+    super(address, logIndex, transactionLogIndex);
     this.params = params;
   }
 }
@@ -40,8 +51,13 @@ export class Withdrawal extends ethereum.Event {
 export class PriceUpdate extends ethereum.Event {
   params: PriceUpdateParams;
 
-  constructor(params: PriceUpdateParams) {
-    super();
+  constructor(
+    address: Address,
+    logIndex: BigInt,
+    transactionLogIndex: BigInt,
+    params: PriceUpdateParams
+  ) {
+    super(address, logIndex, transactionLogIndex);
     this.params = params;
   }
 }
