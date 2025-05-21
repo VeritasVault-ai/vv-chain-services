@@ -151,10 +151,13 @@ def update_metadata():
     }
     
     output_file = os.path.join(DATA_DIR, "metadata.json")
-    with open(output_file, "w") as f:
-        json.dump(metadata, f, indent=2)
-    
-    logger.info(f"Updated metadata at {output_file}")
+    try:
+        with open(output_file, "w") as f:
+            json.dump(metadata, f, indent=2)
+        os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
+        logger.info(f"Updated metadata at {output_file}")
+    except IOError as e:
+        logger.exception(f"Failed to write metadata to {output_file}")
 
 def main():
     """Main function to update all DefiLlama data"""
