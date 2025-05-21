@@ -164,11 +164,10 @@
         "name": "Goldsky CLI: Serve",
         "type": "node",
         "request": "launch",
-        "runtimeExecutable": "goldsky",
+        "runtimeExecutable": "${workspaceFolder:Root}/node_modules/.bin/goldsky",
         "args": ["serve"],
         "cwd": "${workspaceFolder:Root}",
         "console": "integratedTerminal"
-      }
     ],
     "compounds": [
       {
