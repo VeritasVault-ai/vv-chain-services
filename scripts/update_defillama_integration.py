@@ -62,8 +62,29 @@ def fetch_protocols():
         
         logger.info(f"Saved {len(protocols)} protocols to {output_file}")
         return protocols
+    try:
+        response = requests.get(url, headers=get_headers())
+        response.raise_for_status()
+        protocols = response.json()
+        
+        # Save to file
+        output_file = os.path.join(DATA_DIR, "protocols.json")
+        with open(output_file, "w") as f:
+            json.dump(protocols, f, indent=2)
+        
+        logger.info(f"Saved {len(protocols)} protocols to {output_file}")
+        return protocols
+    except requests.exceptions.RequestException as e:
+        logger.exception("Network error while fetching protocols")
+        return None
+    except json.JSONDecodeError as e:
+        logger.exception("Failed to decode JSON response from protocols API")
+        return None
+    except IOError as e:
+        logger.exception(f"Failed to write protocols to {output_file}")
+        return None
     except Exception as e:
-        logger.error(f"Error fetching protocols: {e}")
+        logger.exception("Unexpected error while fetching protocols")
         return None
 
 def fetch_tvl_data():
