@@ -1,14 +1,14 @@
 import { BigInt, Bytes, ethereum, Address } from '@graphprotocol/graph-ts';
 
-// Import the generated contract bindings
-import {
-  Deposit as DepositEvent,
-  Withdrawal as WithdrawalEvent,
-  PriceUpdate as PriceUpdateEvent
-} from '../generated/VaultContract/VaultContract';
+ // Import the generated contract bindings
+ import {
+   Deposit as DepositEvent,
+   Withdrawal as WithdrawalEvent,
+   PriceUpdate as PriceUpdateEvent
+ } from '../generated/VaultContract/VaultContract';
 
-// Import the generated schema types
-import { Vault, Transaction, PriceUpdate as PriceUpdateEntity } from '../generated/schema';
+ // Constants
+ const DEFAULT_TOTAL_VALUE = 0;
 
 /**
  * Handles a deposit event by updating the corresponding vault's total value and recording the deposit transaction.
@@ -25,7 +25,7 @@ export function handleDeposit(event: DepositEvent): void {
   if (!vault) {
     vault = new Vault(vaultId);
     vault.owner = event.params.from;
-    vault.totalValue = BigInt.fromI32(0);
+    vault.totalValue = BigInt.fromI32(DEFAULT_TOTAL_VALUE);
     vault.createdAt = event.block.timestamp;
     vault.updatedAt = event.block.timestamp;
   }
@@ -66,7 +66,7 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
   if (!vault) {
     vault = new Vault(vaultId);
     vault.owner = event.params.to;
-    vault.totalValue = BigInt.fromI32(0);
+    vault.totalValue = BigInt.fromI32(DEFAULT_TOTAL_VALUE);
     vault.createdAt = event.block.timestamp;
   }
   
@@ -110,7 +110,7 @@ export function handlePriceUpdate(event: PriceUpdateEvent): void {
   if (!vault) {
     vault = new Vault(vaultId);
     vault.owner = event.transaction.from;
-    vault.totalValue = BigInt.fromI32(0);
+    vault.totalValue = BigInt.fromI32(DEFAULT_TOTAL_VALUE);
     vault.createdAt = event.block.timestamp;
     vault.updatedAt = event.block.timestamp;
     vault.save();
