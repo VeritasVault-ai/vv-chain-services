@@ -83,7 +83,7 @@ jobs:
 
       # Notify about deployment completion
       - name: Notify deployment completion
-        if: always()
+        if: success()
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
