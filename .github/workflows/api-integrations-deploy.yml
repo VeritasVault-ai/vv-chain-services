@@ -55,7 +55,7 @@ jobs:
 
       - name: Deploy to Goldsky
         if: github.event.inputs.deploy_target == 'all' || github.event.inputs.deploy_target == 'goldsky' || github.event.inputs.deploy_target == null
-        run: goldsky deploy
+        run: cd src/goldsky && goldsky deploy
         env:
           GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
 
