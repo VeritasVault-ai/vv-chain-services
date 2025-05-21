@@ -29,7 +29,9 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 
 
 def get_headers():
-    """Get headers for API requests with authentication if available"""
+    """
+    Returns HTTP headers for CoinGecko API requests, including an API key if set.
+    """
     headers = {
         "Accept": "application/json"
     }
@@ -38,7 +40,12 @@ def get_headers():
     return headers
 
 def fetch_coins_list():
-    """Fetch list of all coins from CoinGecko"""
+    """
+    Fetches the complete list of coins from the CoinGecko API and saves it to a local JSON file.
+    
+    Returns:
+        The list of coins as parsed from the API response, or None if the request fails.
+    """
     url = f"{COINGECKO_API_BASE}/coins/list"
     logger.info(f"Fetching coins list from {url}")
     
@@ -69,7 +76,12 @@ def fetch_coins_list():
         return None
 
 def fetch_global_data():
-    """Fetch global cryptocurrency market data"""
+    """
+    Fetches global cryptocurrency market data from the CoinGecko API.
+    
+    Retrieves overall market statistics, saves the data to 'global.json' in the data directory,
+    and returns the parsed JSON data. Returns None if the request fails.
+    """
     url = f"{COINGECKO_API_BASE}/global"
     logger.info(f"Fetching global market data from {url}")
     
@@ -96,7 +108,17 @@ def fetch_global_data():
         return None
 
 def fetch_top_coins(limit=250):
-    """Fetch top coins by market cap with detailed data"""
+    """
+    Fetches detailed market data for the top cryptocurrencies by market capitalization.
+    
+    Retrieves market data for the top `limit` coins from the CoinGecko API, including price change percentages over 1 hour, 24 hours, and 7 days. Saves the resulting data to a JSON file in the data directory. Returns the data as a list of dictionaries, or None if the request fails.
+    
+    Args:
+        limit: The number of top coins to fetch (default is 250).
+    
+    Returns:
+        A list of dictionaries containing market data for each coin, or None on failure.
+    """
     url = f"{COINGECKO_API_BASE}/coins/markets"
     params = {
         "vs_currency": "usd",
@@ -166,7 +188,12 @@ def update_metadata():
     logger.info(f"Updated metadata at {output_file}")
 
 def main():
-    """Main function to update all CoinGecko data"""
+    """
+    Coordinates the full update process for CoinGecko data, including fetching all datasets,
+    saving them locally, updating metadata, and logging progress.
+    
+    Exits the program with status 1 if any data fetch fails.
+    """
     logger.info("Starting CoinGecko integration update")
     start_time = time.time()
     

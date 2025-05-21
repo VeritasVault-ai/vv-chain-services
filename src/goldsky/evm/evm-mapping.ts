@@ -10,6 +10,11 @@ import {
 // Import the generated schema types
 import { Vault, Transaction, PriceUpdate as PriceUpdateEntity } from '../generated/schema';
 
+/**
+ * Handles a deposit event by updating the corresponding vault's total value and recording the deposit transaction.
+ *
+ * If the vault does not exist, it is created and initialized with the depositor as the owner.
+ */
 export function handleDeposit(event: DepositEvent): void {
   // Extract data from the EVM event
   let vaultId = event.params.from.toHexString();
@@ -44,6 +49,13 @@ export function handleDeposit(event: DepositEvent): void {
   transaction.save();
 }
 
+/**
+ * Handles a Withdrawal event by updating the corresponding Vault entity and recording the withdrawal as a Transaction.
+ *
+ * If the vault does not exist, it is created. The vault's total value is decreased by the withdrawal amount, or set to zero if insufficient funds are available. A Transaction entity is created to record the withdrawal details.
+ *
+ * @remark If the withdrawal amount exceeds the vault's total value, the vault's total value is set to zero rather than reverting or throwing an error.
+ */
 export function handleWithdrawal(event: WithdrawalEvent): void {
   // Extract data from the EVM event
   let vaultId = event.params.to.toHexString();
@@ -82,6 +94,11 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
   transaction.save();
 }
 
+/**
+ * Handles a PriceUpdate event by recording the updated asset price for a vault.
+ *
+ * Loads or creates the associated Vault entity, then creates a new PriceUpdate entity with the asset, price, and event metadata.
+ */
 export function handlePriceUpdate(event: PriceUpdateEvent): void {
   // Extract data from the EVM event
   let vaultId = event.transaction.from.toHexString();
