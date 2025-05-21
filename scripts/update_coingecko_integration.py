@@ -154,10 +154,15 @@ def main():
     os.makedirs(DATA_DIR, exist_ok=True)
     
     # Fetch all required data
-    fetch_coins_list()
-    fetch_global_data()
-    fetch_top_coins(250)
-    fetch_categories()
+    success = True
+    success = fetch_coins_list() is not None and success
+    success = fetch_global_data() is not None and success
+    success = fetch_top_coins(250) is not None and success
+    success = fetch_categories() is not None and success
+    
+    if not success:
+        logger.error("One or more operations failed")
+        sys.exit(1)
     
     # Update metadata
     update_metadata()
