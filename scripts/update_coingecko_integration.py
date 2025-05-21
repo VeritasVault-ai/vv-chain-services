@@ -29,8 +29,7 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 def get_headers():
     """Get headers for API requests with authentication if available"""
     headers = {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
+        "Accept": "application/json"
     }
     if COINGECKO_API_KEY:
         headers["X-CG-Pro-API-Key"] = COINGECKO_API_KEY
