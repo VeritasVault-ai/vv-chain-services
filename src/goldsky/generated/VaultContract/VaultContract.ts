@@ -14,7 +14,7 @@ export class WithdrawalParams {
 }
 
 export class PriceUpdateParams {
-  asset: string;
+  asset: Address;
   price: BigInt;
 }
 
