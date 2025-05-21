@@ -153,7 +153,7 @@ def update_metadata():
     The metadata file is saved in the data directory with user read/write permissions.
     """
     try:
-        with open(output_file, "w") as f:
+        with open(metadata['output_file'], "w") as f:
             json.dump(metadata, f, indent=JSON_INDENT)
         os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
         logger.info(f"Updated metadata at {output_file}")
