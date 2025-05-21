@@ -185,7 +185,7 @@ def fetch_chains():
         "api_base": DEFILLAMA_API_BASE,
         "output_file": os.path.join(DATA_DIR, "metadata.json")
     }
-    
+    """  
     The metadata file is saved in the data directory with user read/write permissions.
     """
     try:
