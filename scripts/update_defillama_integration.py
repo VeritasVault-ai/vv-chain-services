@@ -127,8 +127,6 @@ def fetch_chains():
         response = requests.get(url, headers=get_headers(), timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
         chains_data = response.json()
-
-        # Save to file
         output_file = os.path.join(DATA_DIR, "chains.json")
         with open(output_file, "w") as f:
             json.dump(chains_data, f, indent=JSON_INDENT)
@@ -148,22 +146,22 @@ def fetch_chains():
         logger.exception("Unexpected error while fetching chains data")
         return None
 
-    metadata = {
-        "last_updated": datetime.utcnow().isoformat(),
-        "version": API_VERSION,
-        "api_base": DEFILLAMA_API_BASE,
-        "output_file": os.path.join(DATA_DIR, "metadata.json")
-    }
-    """  
-    The metadata file is saved in the data directory with user read/write permissions.
-    """
-    try:
-        with open(output_file, "w") as f:
-            json.dump(metadata, f, indent=JSON_INDENT)
-        os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
-        logger.info(f"Updated metadata at {output_file}")
-    except IOError as e:
-        logger.exception(f"Failed to write metadata to {output_file}")
+metadata = {
+    "last_updated": datetime.utcnow().isoformat(),
+    "version": API_VERSION,
+    "api_base": DEFILLAMA_API_BASE,
+    "output_file": os.path.join(DATA_DIR, "metadata.json")
+}
+"""  
+The metadata file is saved in the data directory with user read/write permissions.
+"""
+try:
+    with open(output_file, "w") as f:
+        json.dump(metadata, f, indent=JSON_INDENT)
+    os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
+    logger.info(f"Updated metadata at {output_file}")
+except IOError as e:
+    logger.exception(f"Failed to write metadata to {output_file}")
 
 def main():
     """
@@ -173,15 +171,15 @@ def main():
     """
     logger.info("Starting DefiLlama integration update")
     start_time = time.time()
-    
+
     # Create data directory if it doesn't exist
     os.makedirs(DATA_DIR, exist_ok=True)
-    
+
     # Fetch all required data
     protocols = fetch_protocols()
     tvl_data = fetch_tvl_data()
     chains = fetch_chains()
-    
+
     if not all([protocols, tvl_data, chains]):
         logger.error("One or more data fetches failed")
         sys.exit(ERROR_EXIT_CODE)
