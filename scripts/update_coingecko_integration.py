@@ -231,7 +231,12 @@ def fetch_categories():
         logger.info(f"Saved {len(categories)} categories to {output_file}")
         return categories
     except Exception as e:
-        logger.error(f"Error fetching categories: {e}")
+        logger.error(
+            f"Error fetching categories: {str(e)}, "
+            f"Status Code: {e.response.status_code if hasattr(e, 'response') else 'N/A'}, "
+            f"Response: {e.response.text if hasattr(e, 'response') else 'N/A'}, "
+            f"URL: {url}"
+        )
         return None
 
 
