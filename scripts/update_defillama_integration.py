@@ -147,37 +147,6 @@ def fetch_chains():
     except Exception:
         logger.exception("Unexpected error while fetching chains data")
         return None
-def fetch_chains():
-    """Fetch chains data from DefiLlama"""
-    url = f"{DEFILLAMA_API_BASE}/chains"
-    logger.info(f"Fetching chains data from {url}")
-    
-    try:
-        response = requests.get(url, headers=get_headers(), timeout=REQUEST_TIMEOUT)
-        response.raise_for_status()
-        chains_data = response.json()
-        
-        # Save to file
-        output_file = os.path.join(DATA_DIR, "chains.json")
-        with open(output_file, "w") as f:
-            json.dump(chains_data, f, indent=JSON_INDENT)
-        
-        logger.info(f"Saved chains data to {output_file}")
-        return chains_data
-    except requests.exceptions.RequestException as e:
-        logger.exception("Network error while fetching chains data")
-        return None
-    except json.JSONDecodeError as e:
-        logger.exception("Failed to decode JSON response from chains API")
-        return None
-    except IOError as e:
-        logger.exception(f"Failed to write chains data to {output_file}")
-        return None
-    except Exception as e:
-        logger.exception("Unexpected error while fetching chains data")
-        return None
-
-
 
     metadata = {
         "last_updated": datetime.utcnow().isoformat(),
