@@ -27,7 +27,13 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 
 
 def get_headers():
-    """Get headers for API requests with authentication if available"""
+    """Get headers for API requests, including authentication if API key is available.
+
+    Authentication increases rate limits and enables access to premium features.
+    Set DEFILLAMA_API_KEY environment variable to enable authentication.
+
+    Returns:
+        dict: Headers with content-type and optional authentication token."""
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json"
