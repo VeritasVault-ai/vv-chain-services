@@ -49,98 +49,51 @@ def get_headers():
         headers["Authorization"] = f"Bearer {DEFILLAMA_API_KEY}"
     return headers
 
-def fetch_protocols():
-    """Fetch all protocols from DefiLlama"""
-    url = f"{DEFILLAMA_API_BASE}/protocols"
-    logger.info(f"Fetching protocols from {url}")
+def fetch_and_save_data(endpoint, filename, data_description):
+    """Generic function to fetch data from DefiLlama API and save it to a file"""
+    url = f"{DEFILLAMA_API_BASE}/{endpoint}"
+    logger.info(f"Fetching {data_description} from {url}")
 
     try:
         response = requests.get(url, headers=get_headers(), timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
-        protocols = response.json()
+        data = response.json()
 
         # Save to file
-        output_file = os.path.join(DATA_DIR, "protocols.json")
+        output_file = os.path.join(DATA_DIR, filename)
         with open(output_file, "w") as f:
-            json.dump(protocols, f, indent=JSON_INDENT)
+            json.dump(data, f, indent=JSON_INDENT)
         os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
 
-        logger.info(f"Saved {len(protocols)} protocols to {output_file}")
-        return protocols
+        logger.info(f"Saved {data_description} to {output_file}")
+        return data
     except requests.exceptions.RequestException:
-        logger.exception("Network error while fetching protocols")
+        logger.exception(f"Network error while fetching {data_description}")
         return None
     except json.JSONDecodeError:
-        logger.exception("Failed to decode JSON response from protocols API")
+        logger.exception(f"Failed to decode JSON response from {data_description} API")
         return None
     except IOError:
-        logger.exception(f"Failed to write protocols to {output_file}")
+        logger.exception(f"Failed to write {data_description} to {output_file}")
         return None
     except Exception:
-        logger.exception("Unexpected error while fetching protocols")
+        logger.exception(f"Unexpected error while fetching {data_description}")
         return None
+
+def fetch_protocols():
+    """Fetch all protocols from DefiLlama"""
+    protocols = fetch_and_save_data("protocols", "protocols.json", "protocols")
+    if protocols:
+        logger.info(f"Fetched {len(protocols)} protocols")
+    return protocols
 
 def fetch_tvl_data():
     """Fetch TVL data from DefiLlama"""
-    url = f"{DEFILLAMA_API_BASE}/charts"
-    logger.info(f"Fetching TVL data from {url}")
-
-    try:
-        response = requests.get(url, headers=get_headers(), timeout=REQUEST_TIMEOUT)
-        response.raise_for_status()
-        tvl_data = response.json()
-
-        # Save to file
-        output_file = os.path.join(DATA_DIR, "tvl.json")
-
-        with open(output_file, "w") as f:
-            json.dump(tvl_data, f, indent=JSON_INDENT)
-        os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
-
-        logger.info(f"Saved TVL data to {output_file}")
-        return tvl_data
-    except requests.exceptions.RequestException:
-        logger.exception("Network error while fetching TVL data")
-        return None
-    except json.JSONDecodeError:
-        logger.exception("Failed to decode JSON response from TVL API")
-        return None
-    except IOError:
-        logger.exception(f"Failed to write TVL data to {output_file}")
-        return None
-    except Exception:
-        logger.exception("Unexpected error while fetching TVL data")
-        return None
+    return fetch_and_save_data("charts", "tvl.json", "TVL data")
 
 def fetch_chains():
     """Fetch chains data from DefiLlama"""
-    url = f"{DEFILLAMA_API_BASE}/chains"
-    logger.info(f"Fetching chains data from {url}")
-
-    try:
-        response = requests.get(url, headers=get_headers(), timeout=REQUEST_TIMEOUT)
-        response.raise_for_status()
-        chains_data = response.json()
-        # Save to file
-        output_file = os.path.join(DATA_DIR, "chains.json")
-        with open(output_file, "w") as f:
-            json.dump(chains_data, f, indent=JSON_INDENT)
-        os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
-        
-        logger.info(f"Saved chains data to {output_file}")
-        return chains_data
-    except requests.exceptions.RequestException:
-        logger.exception("Network error while fetching chains data")
-        return None
-    except json.JSONDecodeError:
-        logger.exception("Failed to decode JSON response from chains API")
-        return None
-    except IOError:
-        logger.exception(f"Failed to write chains data to {output_file}")
-        return None
-    except Exception:
-        logger.exception("Unexpected error while fetching chains data")
-        return None
+    return fetch_and_save_data("chains", "chains.json", "chains data")
 
 def update_metadata():
     """  
