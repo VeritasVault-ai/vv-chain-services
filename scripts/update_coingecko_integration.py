@@ -149,12 +149,15 @@ def fetch_global_data():
         logger.info(f"Saved global market data to {output_file}")
         return global_data
     except Exception as e:
-        logger.error(
-            f"Error fetching global market data: {str(e)}, "
-            f"Status Code: {e.response.status_code if hasattr(e, 'response') else 'N/A'}, "
-            f"Response: {e.response.text if hasattr(e, 'response') else 'N/A'}, "
-            f"URL: {url}"
-        )
+     except Exception as e:
+-        logger.error(f"Error fetching top coins: {e}")
++        logger.error(
++            f"Error fetching top coins: {str(e)}, "
++            f"Status Code: {e.response.status_code if hasattr(e, 'response') else 'N/A'}, "
++            f"Response: {e.response.text if hasattr(e, 'response') else 'N/A'}, "
++            f"URL: {url}"
++        )
+         return None
         return None
 
 def fetch_top_coins(limit=DEFAULT_TOP_COINS_LIMIT):
