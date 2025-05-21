@@ -168,6 +168,7 @@
         "args": ["serve"],
         "cwd": "${workspaceFolder:Root}",
         "console": "integratedTerminal"
+      }
     ],
     "compounds": [
       {
