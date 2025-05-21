@@ -179,16 +179,21 @@ def fetch_chains():
 
 
 
+    def update_metadata():
+    """
+    Creates or updates the metadata.json file with the current timestamp, version, and API base URL.
+
+    The metadata file is saved in the data directory with user read/write permissions.
+    """
+    from datetime import datetime
+
     metadata = {
         "last_updated": datetime.utcnow().isoformat(),
         "version": API_VERSION,
-        "api_base": DEFILLAMA_API_BASE.
-        "output_file" = os.path.join(DATA_DIR, "metadata.json")
-    """
-    Creates or updates the metadata.json file with the current timestamp, version, and API base URL.
-    
-    The metadata file is saved in the data directory with user read/write permissions.
-    """
+        "api_base": DEFILLAMA_API_BASE
+    }
+
+    output_file = os.path.join(DATA_DIR, "metadata.json")
     try:
         with open(output_file, "w") as f:
             json.dump(metadata, f, indent=JSON_INDENT)
@@ -196,7 +201,6 @@ def fetch_chains():
         logger.info(f"Updated metadata at {output_file}")
     except IOError as e:
         logger.exception(f"Failed to write metadata to {output_file}")
-
 def main():
     """
     Coordinates the full DefiLlama data update process, including data fetching and metadata refresh.
