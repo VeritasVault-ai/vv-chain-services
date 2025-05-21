@@ -77,6 +77,11 @@ export class Transaction extends Entity {
     return this.get("vault").toString();
   }
 
+  /**
+   * The source address for deposits. Null for withdrawals.
+   * This field is nullable because transactions can be either deposits (with 'from' address)
+   * or withdrawals (with 'to' address), but never both.
+   */
   set from(value: Bytes | null) {
     this.set("from", value);
   }
