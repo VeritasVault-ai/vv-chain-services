@@ -182,10 +182,9 @@ def fetch_chains():
     metadata = {
         "last_updated": datetime.utcnow().isoformat(),
         "version": API_VERSION,
-        "api_base": DEFILLAMA_API_BASE.
-        "output_file" = os.path.join(DATA_DIR, "metadata.json")
-    """
-    Creates or updates the metadata.json file with the current timestamp, version, and API base URL.
+        "api_base": DEFILLAMA_API_BASE,
+        "output_file": os.path.join(DATA_DIR, "metadata.json")
+    }
     
     The metadata file is saved in the data directory with user read/write permissions.
     """
