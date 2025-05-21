@@ -25,8 +25,6 @@ COINGECKO_API_BASE = "https://api.coingecko.com/api/v3"
 COINGECKO_API_KEY = os.environ.get("COINGECKO_API_KEY", "")
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "coingecko")
 
-# Ensure data directory exists
-os.makedirs(DATA_DIR, exist_ok=True)
 
 def get_headers():
     """Get headers for API requests with authentication if available"""
