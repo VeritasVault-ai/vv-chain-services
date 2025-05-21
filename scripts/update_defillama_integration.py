@@ -47,7 +47,7 @@ def fetch_protocols():
     logger.info(f"Fetching protocols from {url}")
     
     try:
-        response = requests.get(url, headers=get_headers())
+        response = requests.get(url, headers=get_headers(), timeout=30)
         response.raise_for_status()
         protocols = response.json()
         
