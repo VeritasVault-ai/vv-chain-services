@@ -69,8 +69,11 @@ def fetch_protocols():
         
         # Save to file
         output_file = os.path.join(DATA_DIR, "protocols.json")
+        # Save to file
+        output_file = os.path.join(DATA_DIR, "protocols.json")
         with open(output_file, "w") as f:
             json.dump(protocols, f, indent=2)
+        os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
         
         logger.info(f"Saved {len(protocols)} protocols to {output_file}")
         return protocols
