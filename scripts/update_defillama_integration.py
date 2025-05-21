@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """
 DefiLlama Integration Update Script
 This script handles updating and synchronizing data from DefiLlama API.
@@ -39,7 +40,7 @@ DATA_DIR = os.path.join(
 def get_headers():
     """
     Returns HTTP headers for DefiLlama API requests, including authentication if an API key is set.
-    
+
     If the DEFILLAMA_API_KEY environment variable is present, adds a bearer token for authenticated requests.
     """
     headers = {
@@ -49,146 +50,98 @@ def get_headers():
         headers["Authorization"] = f"Bearer {DEFILLAMA_API_KEY}"
     return headers
 
-def fetch_protocols():
-    """Fetch all protocols from DefiLlama"""
-    url = f"{DEFILLAMA_API_BASE}/protocols"
-    logger.info(f"Fetching protocols from {url}")
-
+def fetch_and_save_data(url, output_filename, description="data"):
+    """
+    Generic helper function to fetch JSON from a URL and save it to a file
+    with consistent error handling and user read/write permissions.
+    """
+    logger.info(f"Fetching {description} from {url}")
     try:
         response = requests.get(url, headers=get_headers(), timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
-        protocols = response.json()
+        data = response.json()
 
-        # Save to file
-        output_file = os.path.join(DATA_DIR, "protocols.json")
-        try:
-            with open(output_file, "w") as f:
-                json.dump(protocols, f, indent=JSON_INDENT)
-        except IOError as e:
-            logger.error(f"Failed to write protocols to {output_file}: {e}")
-            return None
+        output_file = os.path.join(DATA_DIR, output_filename)
+        with open(output_file, "w") as f:
+            json.dump(data, f, indent=JSON_INDENT)
+        os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
 
-        logger.info(f"Saved {len(protocols)} protocols to {output_file}")
-        return protocols
+        logger.info(f"Saved {description} to {output_file}")
+        return data
     except requests.exceptions.RequestException:
-        logger.exception("Network error while fetching protocols")
+        logger.exception(f"Network error while fetching {description}")
         return None
     except json.JSONDecodeError:
-        logger.exception("Failed to decode JSON response from protocols API")
+        logger.exception(f"Failed to decode JSON response for {description}")
         return None
     except IOError:
-        logger.exception(f"Failed to write protocols to {output_file}")
+        logger.exception(f"Failed to write {description} to {output_file}")
         return None
     except Exception:
-        logger.exception("Unexpected error while fetching protocols")
+        logger.exception(f"Unexpected error while fetching {description}")
         return None
+
+def fetch_protocols():
+    """Fetch all protocols from DefiLlama"""
+    url = f"{DEFILLAMA_API_BASE}/protocols"
+    protocols = fetch_and_save_data(url, "protocols.json", "protocols")
+    if protocols:
+        logger.info(f"Processed {len(protocols)} protocols")
+    return protocols
 
 def fetch_tvl_data():
     """Fetch TVL data from DefiLlama"""
     url = f"{DEFILLAMA_API_BASE}/charts"
-    logger.info(f"Fetching TVL data from {url}")
-
-    try:
-        response = requests.get(url, headers=get_headers(), timeout=REQUEST_TIMEOUT)
-        response.raise_for_status()
-        tvl_data = response.json()
-
-        # Save to file
-        output_file = os.path.join(DATA_DIR, "tvl.json")
-        try:
-            with open(output_file, "w") as f:
-                json.dump(tvl_data, f, indent=JSON_INDENT)
-            os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
-        except IOError as e:
-            logger.exception(f"Failed to write TVL data to {output_file}")
-            return None
-
-        logger.info(f"Saved TVL data to {output_file}")
-        return tvl_data
-    except requests.exceptions.RequestException:
-        logger.exception("Network error while fetching TVL data")
-        return None
-    except json.JSONDecodeError:
-        logger.exception("Failed to decode JSON response from TVL API")
-        return None
-    except IOError:
-        logger.exception(f"Failed to write TVL data to {output_file}")
-        return None
-    except Exception:
-        logger.exception("Unexpected error while fetching TVL data")
-        return None
+    return fetch_and_save_data(url, "tvl.json", "TVL data")
 
 def fetch_chains():
     """Fetch chains data from DefiLlama"""
     url = f"{DEFILLAMA_API_BASE}/chains"
-    logger.info(f"Fetching chains data from {url}")
+    return fetch_and_save_data(url, "chains.json", "chains data")
 
-    try:
-        response = requests.get(url, headers=get_headers(), timeout=REQUEST_TIMEOUT)
-        response.raise_for_status()
-        chains_data = response.json()
-
-        # Save to file
-        output_file = os.path.join(DATA_DIR, "chains.json")
-        with open(output_file, "w") as f:
-            json.dump(chains_data, f, indent=JSON_INDENT)
-
-        logger.info(f"Saved chains data to {output_file}")
-        return chains_data
-    except requests.exceptions.RequestException:
-        logger.exception("Network error while fetching chains data")
-        return None
-    except json.JSONDecodeError:
-        logger.exception("Failed to decode JSON response from chains API")
-        return None
-    except IOError:
-        logger.exception(f"Failed to write chains data to {output_file}")
-        return None
-    except Exception:
-        logger.exception("Unexpected error while fetching chains data")
-        return None
-
+def update_metadata():
+    """
+    Creates or updates the metadata.json file with the current timestamp,
+    version, and API base URL.
+    """
     metadata = {
         "last_updated": datetime.utcnow().isoformat(),
         "version": API_VERSION,
-        "api_base": DEFILLAMA_API_BASE,
-        "output_file": os.path.join(DATA_DIR, "metadata.json")
+        "api_base": DEFILLAMA_API_BASE
     }
-    """  
-    The metadata file is saved in the data directory with user read/write permissions.
-    """
+    output_file = os.path.join(DATA_DIR, "metadata.json")
     try:
         with open(output_file, "w") as f:
             json.dump(metadata, f, indent=JSON_INDENT)
         os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
         logger.info(f"Updated metadata at {output_file}")
-    except IOError as e:
+    except IOError:
         logger.exception(f"Failed to write metadata to {output_file}")
 
 def main():
     """
     Coordinates the full DefiLlama data update process, including data fetching and metadata refresh.
-    
+
     Creates the data directory if needed, retrieves protocols, TVL, and chains data from the DefiLlama API, saves them locally, updates metadata, and logs progress. Exits with an error if any data fetch fails.
     """
     logger.info("Starting DefiLlama integration update")
     start_time = time.time()
-    
+
     # Create data directory if it doesn't exist
     os.makedirs(DATA_DIR, exist_ok=True)
-    
+
     # Fetch all required data
     protocols = fetch_protocols()
     tvl_data = fetch_tvl_data()
     chains = fetch_chains()
-    
+
     if not all([protocols, tvl_data, chains]):
         logger.error("One or more data fetches failed")
         sys.exit(ERROR_EXIT_CODE)
-    
+
     # Update metadata
     update_metadata()
-    
+
     elapsed_time = time.time() - start_time
     logger.info(f"DefiLlama integration update completed in {elapsed_time:.2f} seconds")
 
