@@ -103,9 +103,11 @@ def fetch_top_coins(limit=250):
     logger.info(f"Fetching top {limit} coins from {url}")
     
     try:
-        response = requests.get(url, headers=get_headers(), params=params)
-        response.raise_for_status()
-        top_coins = response.json()
+-        response = requests.get(url, headers=get_headers(), params=params)
++        response = requests.get(url, headers=get_headers(), params=params, timeout=30)
+         response.raise_for_status()
++        respect_rate_limits(response)
+         top_coins = response.json()
         
         # Save to file
         output_file = os.path.join(DATA_DIR, f"top_{limit}_coins.json")
