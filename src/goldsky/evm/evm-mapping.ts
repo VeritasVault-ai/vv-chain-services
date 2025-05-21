@@ -105,7 +105,7 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
  */
 export function handlePriceUpdate(event: PriceUpdateEvent): void {
   // Extract data from the EVM event
-  let vaultId = event.transaction.from.toHexString();
+  let vaultId = event.params.owner.toHexString();
   let asset = event.params.asset;
   let price = event.params.price;
   
