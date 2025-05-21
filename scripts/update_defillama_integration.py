@@ -124,9 +124,14 @@ def main():
     os.makedirs(DATA_DIR, exist_ok=True)
     
     # Fetch all required data
-    fetch_protocols()
-    fetch_tvl_data()
-    fetch_chains()
+    # Fetch all required data
+    protocols = fetch_protocols()
+    tvl_data = fetch_tvl_data()
+    chains = fetch_chains()
+    
+    if not all([protocols, tvl_data, chains]):
+        logger.error("One or more data fetches failed")
+        sys.exit(1)
     
     # Update metadata
     update_metadata()
