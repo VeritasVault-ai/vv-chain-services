@@ -12,6 +12,14 @@ import logging
 import requests
 from datetime import datetime
 
+# Constants
+JSON_INDENT = 2
+DEFAULT_TOP_COINS_LIMIT = 250
+DEFAULT_PAGE = 1
+REQUEST_TIMEOUT = 30
+API_VERSION = "1.0.0"
+ERROR_EXIT_CODE = 1
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -60,7 +68,7 @@ def fetch_coins_list():
         # Save to file
         output_file = os.path.join(DATA_DIR, "coins_list.json")
         with open(output_file, "w") as f:
-            json.dump(coins, f, indent=2)
+            json.dump(coins, f, indent=JSON_INDENT)
         
         logger.info(f"Saved {len(coins)} coins to {output_file}")
         return coins
@@ -82,7 +90,7 @@ def fetch_global_data():
         # Save to file
         output_file = os.path.join(DATA_DIR, "global.json")
         with open(output_file, "w") as f:
-            json.dump(global_data, f, indent=2)
+            json.dump(global_data, f, indent=JSON_INDENT)
         
         logger.info(f"Saved global market data to {output_file}")
         return global_data
@@ -95,14 +103,14 @@ def fetch_global_data():
         )
         return None
 
-def fetch_top_coins(limit=250):
+def fetch_top_coins(limit=DEFAULT_TOP_COINS_LIMIT):
     """Fetch top coins by market cap with detailed data"""
     url = f"{COINGECKO_API_BASE}/coins/markets"
     params = {
         "vs_currency": "usd",
         "order": "market_cap_desc",
         "per_page": limit,
-        "page": 1,
+        "page": DEFAULT_PAGE,
         "sparkline": False,
         "price_change_percentage": "1h,24h,7d"
     }
@@ -110,16 +118,25 @@ def fetch_top_coins(limit=250):
     logger.info(f"Fetching top {limit} coins from {url}")
     
     try:
--        response = requests.get(url, headers=get_headers(), params=params)
-+        response = requests.get(url, headers=get_headers(), params=params, timeout=30)
-         response.raise_for_status()
-+        respect_rate_limits(response)
-         top_coins = response.json()
+        response = requests.get(url, headers=get_headers(), params=params, timeout=REQUEST_TIMEOUT)
+        response.raise_for_status()
+        respect_rate_limits(response)
+        top_coins = response.json()
+        
+        # Save to file
+        output_file = os.path.join(DATA_DIR, f"top_{limit}_coins.json")
+    logger.info(f"Fetching top {limit} coins from {url}")
+    
+    try:
+        response = requests.get(url, headers=get_headers(), params=params, timeout=REQUEST_TIMEOUT)
+        response.raise_for_status()
+        respect_rate_limits(response)
+        top_coins = response.json()
         
         # Save to file
         output_file = os.path.join(DATA_DIR, f"top_{limit}_coins.json")
         with open(output_file, "w") as f:
-            json.dump(top_coins, f, indent=2)
+            json.dump(top_coins, f, indent=JSON_INDENT)
         
         logger.info(f"Saved top {len(top_coins)} coins to {output_file}")
         return top_coins
@@ -127,13 +144,14 @@ def fetch_top_coins(limit=250):
         logger.error(f"Error fetching top coins: {e}")
         return None
 
+
 def fetch_categories():
     """Fetch cryptocurrency categories"""
     url = f"{COINGECKO_API_BASE}/coins/categories"
     logger.info(f"Fetching categories from {url}")
     
     try:
-        response = requests.get(url, headers=get_headers(), timeout=30)
+        response = requests.get(url, headers=get_headers(), timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
         respect_rate_limits(response)
         categories = response.json()
@@ -141,7 +159,7 @@ def fetch_categories():
         # Save to file
         output_file = os.path.join(DATA_DIR, "categories.json")
         with open(output_file, "w") as f:
-            json.dump(categories, f, indent=2)
+            json.dump(categories, f, indent=JSON_INDENT)
         
         logger.info(f"Saved {len(categories)} categories to {output_file}")
         return categories
@@ -149,21 +167,23 @@ def fetch_categories():
         logger.error(f"Error fetching categories: {e}")
         return None
 
+
 def update_metadata():
     """Update metadata file with timestamp and version info"""
     metadata = {
         "last_updated": datetime.utcnow().isoformat(),
-        "version": "1.0.0",
+        "version": API_VERSION,
         "api_base": COINGECKO_API_BASE
     }
     
     output_file = os.path.join(DATA_DIR, "metadata.json")
     with open(output_file, "w") as f:
-        json.dump(metadata, f, indent=2)
+        json.dump(metadata, f, indent=JSON_INDENT)
     import stat  # Add this import at the top if not already present
     os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
     
     logger.info(f"Updated metadata at {output_file}")
+
 
 def main():
     """Main function to update all CoinGecko data"""
@@ -182,13 +202,14 @@ def main():
     
     if not success:
         logger.error("One or more operations failed")
-        sys.exit(1)
+        sys.exit(ERROR_EXIT_CODE)
     
     # Update metadata
     update_metadata()
     
     elapsed_time = time.time() - start_time
     logger.info(f"CoinGecko integration update completed in {elapsed_time:.2f} seconds")
+
 
 if __name__ == "__main__":
     main()
