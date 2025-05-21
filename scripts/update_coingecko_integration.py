@@ -167,7 +167,12 @@ def fetch_top_coins(limit=DEFAULT_TOP_COINS_LIMIT):
         logger.info(f"Saved top {len(top_coins)} coins to {output_file}")
         return top_coins
     except Exception as e:
-        logger.error(f"Error fetching top coins: {str(e)}")
+        logger.error(
+            f"Error fetching top coins: {str(e)}, "
+            f"Status Code: {e.response.status_code if hasattr(e, 'response') else 'N/A'}, "
+            f"Response: {e.response.text if hasattr(e, 'response') else 'N/A'}, "
+            f"URL: {url}"
+        )
         return None
 
 def fetch_categories():
