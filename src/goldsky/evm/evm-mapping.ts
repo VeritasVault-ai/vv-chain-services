@@ -7,6 +7,9 @@ import { BigInt, Bytes, ethereum, Address } from '@graphprotocol/graph-ts';
    PriceUpdate as PriceUpdateEvent
  } from '../generated/VaultContract/VaultContract';
 
+ // Import the generated schema entities
+ import { Vault, Transaction, PriceUpdate as PriceUpdateEntity } from '../generated/schema';
+
  // Constants
  const DEFAULT_TOTAL_VALUE = 0;
 /**
