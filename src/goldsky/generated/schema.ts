@@ -78,9 +78,7 @@ export class Transaction extends Entity {
   }
 
   set from(value: Bytes | null) {
-    if (value) {
-      this.set("from", value);
-    }
+    this.set("from", value);
   }
 
   get from(): Bytes | null {
