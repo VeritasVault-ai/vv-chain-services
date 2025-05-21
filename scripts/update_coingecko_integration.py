@@ -50,6 +50,14 @@ def get_headers():
 def respect_rate_limits(response):
     """Check response headers and respect rate limits"""
     remaining = response.headers.get('X-RateLimit-Remaining')
+    try:
+        remaining = int(response.headers.get("X-RateLimit-Remaining", "999"))
+    except ValueError:
+        remaining = 999
+    if remaining < 5:
+        reset_after = response.headers.get("X-RateLimit-Reset")
+    if reset_after and reset_after.isdigit():
+        sleep_time = int(reset_after) + 1          # header is already “seconds to reset”
     if remaining and int(remaining) < 5:
         reset_time = response.headers.get('X-RateLimit-Reset')
         if reset_time:
