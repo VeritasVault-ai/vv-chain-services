@@ -63,12 +63,10 @@ def fetch_protocols():
         logger.info(f"Saved {len(protocols)} protocols to {output_file}")
         return protocols
     try:
-        response = requests.get(url, headers=get_headers())
+        response = requests.get(url, headers=get_headers(), timeout=30)
         response.raise_for_status()
         protocols = response.json()
         
-        # Save to file
-        output_file = os.path.join(DATA_DIR, "protocols.json")
         # Save to file
         output_file = os.path.join(DATA_DIR, "protocols.json")
         with open(output_file, "w") as f:
