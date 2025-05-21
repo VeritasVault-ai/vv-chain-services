@@ -143,15 +143,16 @@ def fetch_chains():
         return None
 
 def update_metadata():
-    metadata = {
-        "last_updated": datetime.utcnow().isoformat(),
-        "version": API_VERSION,
-        "api_base": DEFILLAMA_API_BASE,
-        "output_file": os.path.join(DATA_DIR, "metadata.json")
-    }
     """  
     The metadata file is saved in the data directory with user read/write permissions.
     """
+    output_file = os.path.join(DATA_DIR, "metadata.json")
+    metadata = {
+        "last_updated": datetime.utcnow().isoformat(),
+        "version": API_VERSION,
+        "api_base": DEFILLAMA_API_BASE
+    }
+
     try:
         with open(metadata['output_file'], "w") as f:
             json.dump(metadata, f, indent=JSON_INDENT)
