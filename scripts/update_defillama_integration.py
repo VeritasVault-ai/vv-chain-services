@@ -159,7 +159,7 @@ def update_metadata():
         os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
         logger.info(f"Updated metadata at {output_file}")
     except IOError as e:
-        logger.exception(f"Failed to write metadata to {output_file}")
+        logger.exception(f"Failed to write metadata to {output_file}, Error: {str(e)}")
 
 def main():
     """
