@@ -117,7 +117,7 @@ def fetch_chains():
     logger.info(f"Fetching chains data from {url}")
     
     try:
-        response = requests.get(url, headers=get_headers())
+        response = requests.get(url, headers=get_headers(), timeout=30)
         response.raise_for_status()
         chains_data = response.json()
         
