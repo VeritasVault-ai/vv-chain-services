@@ -49,27 +49,21 @@ def get_headers():
 
 def respect_rate_limits(response):
     """Check response headers and respect rate limits"""
-    remaining = response.headers.get('X-RateLimit-Remaining')
     try:
         remaining = int(response.headers.get("X-RateLimit-Remaining", "999"))
+        if remaining < 5:
+            reset_time = response.headers.get('X-RateLimit-Reset')
+            if reset_time:
+                sleep_time = max(int(reset_time) - time.time(), 0) + 1
+                logger.info(f"Rate limit approaching, sleeping for {sleep_time} seconds")
+                time.sleep(sleep_time)
+            else:
+                logger.info("Rate limit approaching, sleeping for 10 seconds")
+                time.sleep(10)
     except ValueError:
-        remaining = 999
-    if remaining < 5:
-        reset_after = response.headers.get("X-RateLimit-Reset")
-    if reset_after and reset_after.isdigit():
-        sleep_time = int(reset_after) + 1          # header is already “seconds to reset”
-    if remaining and int(remaining) < 5:
-        reset_time = response.headers.get('X-RateLimit-Reset')
-        if reset_time:
-            sleep_time = max(int(reset_time) - time.time(), 0) + 1
-            logger.info(f"Rate limit approaching, sleeping for {sleep_time} seconds")
-            time.sleep(sleep_time)
-        else:
-            logger.info("Rate limit approaching, sleeping for 10 seconds")
-            time.sleep(10)
+        time.sleep(0.5)  # Default delay on parse error
     else:
-        # Add a small delay between requests regardless
-        time.sleep(0.5)
+        time.sleep(0.5)  # Default delay between requests
 
 def fetch_coins_list():
     """
