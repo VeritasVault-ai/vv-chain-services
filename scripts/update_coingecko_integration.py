@@ -23,6 +23,8 @@ logger = logging.getLogger("coingecko-integration")
 # Configuration
 COINGECKO_API_BASE = "https://api.coingecko.com/api/v3"
 COINGECKO_API_KEY = os.environ.get("COINGECKO_API_KEY", "")
+if not COINGECKO_API_KEY:
+    logger.warning("COINGECKO_API_KEY not set - running in free tier mode with rate limits")
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "coingecko")
 
 
