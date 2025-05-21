@@ -22,6 +22,7 @@ export function handleDeposit(event: DepositEvent): void {
     vault.owner = event.params.from;
     vault.totalValue = BigInt.fromI32(0);
     vault.createdAt = event.block.timestamp;
+    vault.updatedAt = event.block.timestamp;
   }
   
   // Update vault data
