@@ -59,6 +59,7 @@ import { BigInt, Bytes, ethereum, Address } from '@graphprotocol/graph-ts';
      vault.owner = event.params.to;
      vault.totalValue = BigInt.fromI32(DEFAULT_TOTAL_VALUE);
      vault.createdAt = event.block.timestamp;
+      vault.updatedAt = event.block.timestamp;
    }
    
    // Withdrawal: ensure we don't go negative
