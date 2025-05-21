@@ -48,8 +48,12 @@ def fetch_protocols():
         
         # Save to file
         output_file = os.path.join(DATA_DIR, "protocols.json")
-        with open(output_file, "w") as f:
-            json.dump(protocols, f, indent=2)
+        try:
+            with open(output_file, "w") as f:
+                json.dump(protocols, f, indent=2)
+        except IOError as e:
+            logger.error(f"Failed to write protocols to {output_file}: {e}")
+            return None
         
         logger.info(f"Saved {len(protocols)} protocols to {output_file}")
         return protocols
