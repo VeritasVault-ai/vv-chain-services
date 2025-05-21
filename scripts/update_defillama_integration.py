@@ -25,8 +25,6 @@ DEFILLAMA_API_BASE = "https://api.llama.fi"
 DEFILLAMA_API_KEY = os.environ.get("DEFILLAMA_API_KEY", "")
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "defillama")
 
-# Ensure data directory exists
-os.makedirs(DATA_DIR, exist_ok=True)
 
 def get_headers():
     """Get headers for API requests with authentication if available"""
