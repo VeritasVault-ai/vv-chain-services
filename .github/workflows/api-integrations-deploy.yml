@@ -43,7 +43,12 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npx @goldsky/cli login
+          if ! npx @goldsky/cli login; then
+            echo "Goldsky CLI login failed" && exit 1
+          fi
+          if [ ! -f src/ml-engine/requirements.txt ]; then
+            echo "requirements.txt not found" && exit 1
+          fi
           pip install -r src/ml-engine/requirements.txt requests
 
       # Goldsky Deployment
