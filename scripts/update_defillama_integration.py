@@ -35,8 +35,7 @@ def get_headers():
     Returns:
         dict: Headers with content-type and optional authentication token."""
     headers = {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
+        "Accept": "application/json"
     }
     if DEFILLAMA_API_KEY:
         headers["Authorization"] = f"Bearer {DEFILLAMA_API_KEY}"
