@@ -124,8 +124,9 @@ def fetch_categories():
     logger.info(f"Fetching categories from {url}")
     
     try:
-        response = requests.get(url, headers=get_headers())
+        response = requests.get(url, headers=get_headers(), timeout=30)
         response.raise_for_status()
+        respect_rate_limits(response)
         categories = response.json()
         
         # Save to file
