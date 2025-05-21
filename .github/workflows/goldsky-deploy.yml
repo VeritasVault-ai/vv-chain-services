@@ -36,6 +36,7 @@ jobs:
           set -eo pipefail
           echo "Starting Goldsky deployment..."
           deployment_output=$(mktemp)
+          trap "rm -f $deployment_output" EXIT
           if goldsky deploy | tee $deployment_output; then
             echo "Deployment command executed successfully"
             if grep -q "Deployment completed successfully" $deployment_output; then
