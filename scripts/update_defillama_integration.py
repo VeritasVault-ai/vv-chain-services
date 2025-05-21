@@ -101,29 +101,16 @@ def fetch_tvl_data():
         tvl_data = response.json()
         
         # Save to file
-        # Save to file
         output_file = os.path.join(DATA_DIR, "tvl.json")
-+        try:
-+            with open(output_file, "w") as f:
-+                json.dump(tvl_data, f, indent=2)
-+            os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
-+        except IOError as e:
-+            logger.exception(f"Failed to write TVL data to {output_file}")
-+            return None
+        try:
+            with open(output_file, "w") as f:
+                json.dump(tvl_data, f, indent=2)
+            os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
+        except IOError as e:
+            logger.exception(f"Failed to write TVL data to {output_file}")
+            return None
         logger.info(f"Saved TVL data to {output_file}")
         return tvl_data
-    except requests.exceptions.RequestException as e:
-        logger.exception("Network error while fetching TVL data")
-        return None
-    except json.JSONDecodeError as e:
-        logger.exception("Failed to decode JSON response from TVL API")
-        return None
-    except IOError as e:
-        logger.exception(f"Failed to write TVL data to {output_file}")
-        return None
-    except Exception as e:
-        logger.exception("Unexpected error while fetching TVL data")
-        return None
 
 def fetch_chains():
     """Fetch chains data from DefiLlama"""
