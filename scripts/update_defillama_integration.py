@@ -39,7 +39,7 @@ DATA_DIR = os.path.join(
 def get_headers():
     """
     Returns HTTP headers for DefiLlama API requests, including authentication if an API key is set.
-    
+
     If the DEFILLAMA_API_KEY environment variable is present, adds a bearer token for authenticated requests.
     """
     headers = {
@@ -127,7 +127,6 @@ def fetch_chains():
         response = requests.get(url, headers=get_headers(), timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
         chains_data = response.json()
-
         # Save to file
         output_file = os.path.join(DATA_DIR, "chains.json")
         with open(output_file, "w") as f:
