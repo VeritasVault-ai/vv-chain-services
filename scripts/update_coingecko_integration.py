@@ -43,7 +43,16 @@ def fetch_coins_list():
     
     try:
         response = requests.get(url, headers=get_headers())
-        response.raise_for_status()
+        try:
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            logger.error(
+                f"Error fetching coins list: {str(e)}, "
+                f"Status Code: {e.response.status_code if hasattr(e, 'response') else 'N/A'}, "
+                f"Response: {e.response.text if hasattr(e, 'response') else 'N/A'}, "
+                f"URL: {url}"
+            )
+            raise
         coins = response.json()
         
         # Save to file
