@@ -88,7 +88,7 @@ import { BigInt, Bytes, ethereum, Address } from '@graphprotocol/graph-ts';
 
  export function handlePriceUpdate(event: PriceUpdateEvent): void {
    // Extract data from the EVM event
-   let vaultId = event.transaction.from.toHexString();
+   let vaultId = event.params.asset.split('-')[0].toHexString(); // Assuming asset ID format includes vault ID
    let asset = event.params.asset;
    let price = event.params.price;
    
