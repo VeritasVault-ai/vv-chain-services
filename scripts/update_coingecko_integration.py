@@ -98,7 +98,12 @@ def fetch_coins_list():
         logger.info(f"Saved {len(coins)} coins to {output_file}")
         return coins
     except Exception as e:
-        logger.error(f"Error fetching coins list: {e}")
+        logger.error(
+            f"Error fetching coins list: {str(e)}, "
+            f"Status Code: {e.response.status_code if hasattr(e, 'response') else 'N/A'}, "
+            f"Response: {e.response.text if hasattr(e, 'response') else 'N/A'}, "
+            f"URL: {url}"
+        )
         return None
 
 def fetch_global_data():
