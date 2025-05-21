@@ -28,7 +28,7 @@ jobs:
 
       - name: Configure Goldsky
         run: |
-          echo "${{ secrets.GOLDSKY_AUTH_CONFIG }}" > ~/.goldsky/auth.json
+          echo "${{ secrets.GOLDSKY_AUTH_CONFIG }}" > $GITHUB_WORKSPACE/auth.json
         shell: bash
 
       - name: Deploy to Goldsky
