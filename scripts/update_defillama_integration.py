@@ -101,10 +101,15 @@ def fetch_tvl_data():
         tvl_data = response.json()
         
         # Save to file
+        # Save to file
         output_file = os.path.join(DATA_DIR, "tvl.json")
-        with open(output_file, "w") as f:
-            json.dump(tvl_data, f, indent=2)
-        
++        try:
++            with open(output_file, "w") as f:
++                json.dump(tvl_data, f, indent=2)
++            os.chmod(output_file, stat.S_IRUSR | stat.S_IWUSR)
++        except IOError as e:
++            logger.exception(f"Failed to write TVL data to {output_file}")
++            return None
         logger.info(f"Saved TVL data to {output_file}")
         return tvl_data
     except Exception as e:
