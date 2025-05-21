@@ -144,9 +144,15 @@ def update_metadata():
     
     The metadata file is saved in the data directory with user read/write permissions.
     """
-    metadata = {
-        "last_updated": datetime.utcnow().isoformat(),
-        "version": "1.0.0",
+import os
+import sys
+import json
+import time
+import stat
+import logging
+import requests
+from datetime import datetime
+
         "api_base": DEFILLAMA_API_BASE
     }
     
