@@ -231,11 +231,12 @@ def main():
     os.makedirs(DATA_DIR, exist_ok=True)
 
     # Fetch all required data
-    success = True
-    success = fetch_coins_list() is not None and success
-    success = fetch_global_data() is not None and success
-    success = fetch_top_coins() is not None and success
-    success = fetch_categories() is not None and success
+    success = all([
+        fetch_coins_list() is not None,
+        fetch_global_data() is not None,
+        fetch_top_coins() is not None,
+        fetch_categories() is not None
+    ])
 
     if not success:
         logger.error("One or more operations failed")
