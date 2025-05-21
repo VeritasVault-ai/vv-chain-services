@@ -168,7 +168,7 @@
         "args": ["serve"],
         "cwd": "${workspaceFolder:Root}",
         "console": "integratedTerminal"
-    ],
+    }],
     "compounds": [
       {
         "name": "Run Full Stack",
