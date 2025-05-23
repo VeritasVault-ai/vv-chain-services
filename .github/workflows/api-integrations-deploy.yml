@@ -1,0 +1,89 @@
+name: Deploy API Integrations
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'src/**'
+      - 'function-apps/**'
+      - '.github/workflows/api-integrations-deploy.yml'
+  workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: 'Target to deploy (all, goldsky, defillama, coingecko)'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - goldsky
+          - defillama
+          - coingecko
+
+jobs:
+  deploy-integrations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npx @goldsky/cli login
+          pip install -r src/ml-engine/requirements.txt requests
+
+      # Goldsky Deployment
+      - name: Configure Goldsky
+        if: github.event.inputs.deploy_target == 'all' || github.event.inputs.deploy_target == 'goldsky' || github.event.inputs.deploy_target == null
+        run: |
+          mkdir -p ~/.goldsky
+          echo "${{ secrets.GOLDSKY_AUTH_CONFIG }}" > ~/.goldsky/auth.json
+        shell: bash
+
+      - name: Deploy to Goldsky
+        if: github.event.inputs.deploy_target == 'all' || github.event.inputs.deploy_target == 'goldsky' || github.event.inputs.deploy_target == null
+        run: cd src/goldsky && goldsky deploy
+        env:
+          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
+
+      # DefiLlama Integration
+      - name: Update DefiLlama Integration
+        if: github.event.inputs.deploy_target == 'all' || github.event.inputs.deploy_target == 'defillama' || github.event.inputs.deploy_target == null
+        run: |
+          python scripts/update_defillama_integration.py
+        env:
+          DEFILLAMA_API_KEY: ${{ secrets.DEFILLAMA_API_KEY }}
+
+      # CoinGecko Integration
+      - name: Update CoinGecko Integration
+        if: github.event.inputs.deploy_target == 'all' || github.event.inputs.deploy_target == 'coingecko' || github.event.inputs.deploy_target == null
+        run: |
+          python scripts/update_coingecko_integration.py
+        env:
+          COINGECKO_API_KEY: ${{ secrets.COINGECKO_API_KEY }}
+
+      # Notify about deployment completion
+      - name: Notify deployment completion
+        if: always()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: deployments
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_TITLE: API Integrations Deployment
+          SLACK_MESSAGE: 'API Integrations deployed successfully!'
+          SLACK_FOOTER: 'Veritas Vault Chain Services'
