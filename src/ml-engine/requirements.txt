@@ -10,3 +10,5 @@ dataclasses_json~=0.6.7
 jsonschema~=4.23.0
 pytest~=8.3.5
 dataclasses-json~=0.6.7
+requests~=2.32.3
+web3~=7.11.1

@@ -1,105 +1,108 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "BlackLittermanConfig",
+  "title": "BlackLittermanModelData",
   "type": "object",
-  "description": "Configuration for the Black-Litterman model with crypto market data.",
+  "description": "Configuration for the Black-Litterman model with crypto market data and subjective views.",
   "properties": {
     "Model": {
       "type": "string",
-      "enum": ["BlackLitterman"],
-      "description": "Specifies the model type; currently only supports 'BlackLitterman'."
+      "description": "Model type identifier (e.g., 'BlackLitterman')."
+    },
+    "Submodel": {
+      "type": "string",
+      "description": "Name of the specific submodel used under Black-Litterman."
+    },
+    "AssetSymbols": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of asset symbols used in the model."
     },
     "ModelParameters": {
       "type": "object",
-      "description": "Optional parameters to adjust the Black-Litterman model.",
       "properties": {
         "RiskAversion": {
           "type": "number",
-          "description": "Optional risk aversion coefficient (e.g., 2.5)."
+          "description": "Risk aversion coefficient (default = 2.5)."
         },
         "UncertaintyInPrior": {
           "type": "number",
-          "description": "Optional uncertainty in prior estimates (e.g., 0.05)."
+          "description": "Uncertainty in the prior return estimates (default = 0.05)."
         }
       }
     },
     "RiskFreeRates": {
       "type": "array",
-      "description": "List of risk-free rates for different terms.",
+      "description": "List of risk-free rates by term.",
       "items": {
         "type": "object",
         "properties": {
           "term": {
             "type": "string",
             "pattern": "^[1-9]\\d*(B|D|W|M|Y)$",
-            "description": "Term as a number followed by B (business days), D (days), W (weeks), M (months), or Y (years), e.g., '1B', '3D', '2M'."
+            "description": "Term (e.g., '1B', '3D', '2M')."
           },
           "rate": {
             "type": "number",
-            "description": "Risk-free rate as a number (e.g., 0.0175)."
+            "description": "Risk-free rate (e.g., 0.0175)."
           }
         },
         "required": ["term", "rate"]
       }
     },
-    "CryptoMarketData": {
+    "PortfolioViews": {
       "type": "array",
-      "description": "Array of crypto liquidity pools and their market data.",
+      "description": "List of subjective return views for selected asset combinations.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "Symbols": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Assets involved in the view."
+          },
+          "Weights": {
+            "type": "array",
+            "items": { "type": "number" },
+            "description": "Portfolio weights for each asset in the view."
+          },
+          "ExpectedReturn": {
+            "type": "number",
+            "description": "Expected return for the view (e.g., 0.05 = 5%)."
+          },
+          "Confidence": {
+            "type": "number",
+            "description": "Confidence in the view (0 to 1)."
+          }
+        },
+        "required": ["Symbols", "Weights", "ExpectedReturn", "Confidence"]
+      }
+    },
+    "AssetStaticData": {
+      "type": "array",
+      "description": "Metadata for each asset used in the model.",
       "items": {
         "type": "object",
         "properties": {
           "Pool": {
             "type": "string",
-            "description": "Name of the liquidity pool (e.g., 'STETH')."
+            "description": "Name of the liquidity pool (optional)."
           },
           "Project": {
             "type": "string",
-            "description": "Name of the DeFi project (e.g., 'Lido')."
+            "description": "Name of the DeFi project (optional)."
           },
           "Chain": {
             "type": "string",
-            "description": "Blockchain where the pool is deployed (e.g., 'Ethereum')."
+            "description": "Blockchain where the asset or pool exists (optional)."
           },
           "Symbol": {
             "type": "string",
-            "description": "The symbol, e.g. stETH, of the asset"
-          },
-          "Metrics": {
-            "type": "array",
-            "description": "List of time-series metrics for the pool.",
-            "items": {
-              "type": "object",
-              "properties": {
-                "Timestamp": {
-                  "type": "string",
-                  "pattern": "^\\d{4}-\\d{2}-\\d{2}[Tt ]\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,3})?([Zz]|([+-]\\d{2}:\\d{2}))$",
-                  "description": "ISO8601 date-time with optional milliseconds (e.g., '2025-05-03T15:30:00.123Z')."
-                },
-                "TVL": {
-                  "type": "number",
-                  "description": "Total value locked in the pool, as a number."
-                },
-                "APY": {
-                  "type": "number",
-                  "description": "Total annual percentage yield as a number (e.g., 0.0523 for 5.23%)."
-                },
-                "Base APY": {
-                  "type": "number",
-                  "description": "Base APY percentage from the protocol, as a number (e.g., 0.05 for 5%)."
-                },
-                "Reward APY": {
-                  "type": "string",
-                  "pattern": "^[0-9.]+%$",
-                  "description": "Reward APY from incentives, as a number (e.g., 0.0023 for 0.23%)."
-                }
-              },
-              "required": ["Date", "TVL", "APY"]
-            }
+            "description": "Asset symbol (required)."
           }
         },
         "required": ["Symbol"]
       }
     }
   },
-  "required": ["Model", "ModelParameters", "RiskFreeRates", "CryptoMarketData"]
+  "required": ["Model", "Submodel", "AssetSymbols", "ModelParameters", "AssetStaticData"]
 }

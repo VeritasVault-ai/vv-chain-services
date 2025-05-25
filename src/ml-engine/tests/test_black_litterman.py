@@ -24,6 +24,5 @@ def test_deserialization(sample_json: str, expected_model_name: str, expected_su
     model_data = BlackLittermanModelData.from_json(sample_json)
     model = BlPortfolioModel(model_data)
     results = model.calculate()
-    print(results.to_json())
     assert results.Model == expected_model_name
     assert results.Submodel == expected_sub_model_name
