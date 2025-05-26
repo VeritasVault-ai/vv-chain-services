@@ -10,7 +10,7 @@ def sample_json():
     Returns:
         A multi-line JSON string containing model details, risk-free rates, and crypto market data.
     """
-    with open("test_data/black_litterman_explicit_view_test_data.json", "r") as file:
+    with open(os.path.join(os.path.dirname(__file__), "test_data/black_litterman_explicit_view_test_data.json"), "r") as file:
         return file.read()
 
 
