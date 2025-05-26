@@ -1,0 +1,22 @@
+{
+  "name": "plurality-app",
+  "version": "1.0.0",
+  "description": "Plurality Function App for wallet integration via Plurality",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "plurality",
+    "metamask",
+    "wallet",
+    "integration"
+  ],
+  "author": "VeritasVault.ai",
+  "license": "ISC",
+  "dependencies": {
+    "nethereum.js": "^1.0.6",
+    "web3": "^1.8.2"
+  }
+}
+
