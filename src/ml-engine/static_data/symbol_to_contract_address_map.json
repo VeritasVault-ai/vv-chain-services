@@ -26,7 +26,7 @@
   "OSETH": "ethereum:0xf1c9acdc66974dfb6decb12aa385b9cd01190e38",
   "USD0++": "Error: Symbol not found",
   "SUPEROETHB": "Error: Symbol not found",
-  "SLISBNB": "0xb0b84d294e0c75a6abe60171b70edeb2efd14a1b",
+  "SLISBNB": "ethereum:0xb0b84d294e0c75a6abe60171b70edeb2efd14a1b",
   "USDS": "ethereum:0xdc035d45d973e3ec169d2276ddab16f1e407384f",
   "LBTC": "ethereum:0x8236a87084f8b84306f72007f36f2618a5634494",
   "ETHX": "ethereum:0xa35b1b31ce002fbf2058d22f30f95d405200a15b",
