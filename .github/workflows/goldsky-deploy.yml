@@ -1,0 +1,52 @@
+name: Goldsky Deployment
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "src/**"
+      - "function-apps/**"
+      - ".github/workflows/goldsky-deploy.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy-goldsky:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Goldsky CLI
+        run: npm install -g @goldsky/cli@12.0.0
+
+      - name: Configure Goldsky
+        run: |
+          echo "${{ secrets.GOLDSKY_AUTH_CONFIG }}" > $GITHUB_WORKSPACE/auth.json
+        shell: bash
+
+      - name: Deploy to Goldsky
+        run: |
+          set -eo pipefail
+          echo "Starting Goldsky deployment..."
+          deployment_output=$(mktemp)
+          trap "rm -f $deployment_output" EXIT
+          if goldsky deploy | tee $deployment_output; then
+            echo "Deployment command executed successfully"
+            if grep -q "Deployment completed successfully" $deployment_output; then
+              echo "✅ Deployment verified successful"
+            else
+              echo "⚠️ Deployment completed without expected success message"
+              exit 1
+            fi
+          else
+            echo "❌ Deployment failed"
+            exit 1
+          fi
+        env:
+          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}

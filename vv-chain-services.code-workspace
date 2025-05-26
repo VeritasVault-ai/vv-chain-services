@@ -51,15 +51,37 @@
     "cSpell.words": [
       "APIM",
       "azurefunctions",
+      "CoinGecko",
+      "coingecko",
+      "DefiLlama",
+      "defillama",
       "dotnet",
       "fastapi",
       "Goldsky",
+      "goldskycli",
       "pydantic",
       "pytest",
       "Runbooks",
       "uvicorn",
       "veritasvault"
-    ]
+    ],
+    "rest-client.environmentVariables": {
+      "$shared": {
+        "goldsky-api-base": "https://api.goldsky.com",
+        "defillama-api-base": "https://api.llama.fi",
+        "coingecko-api-base": "https://api.coingecko.com/api/v3"
+      },
+      "development": {
+        "goldsky-api-key": "${env:GOLDSKY_API_KEY}",
+        "defillama-api-key": "${env:DEFILLAMA_API_KEY}",
+        "coingecko-api-key": "${env:COINGECKO_API_KEY}"
+      },
+      "production": {
+        "goldsky-api-key": "${env:GOLDSKY_API_KEY_PROD}",
+        "defillama-api-key": "${env:DEFILLAMA_API_KEY_PROD}",
+        "coingecko-api-key": "${env:COINGECKO_API_KEY_PROD}"
+      }
+    }
   },
   "extensions": {
     "recommendations": [
@@ -93,6 +115,11 @@
       "yzhang.markdown-all-in-one",
       // Database
       "cweijan.vscode-redis-client",
+      // API Development
+      "humao.rest-client",
+      "rangav.vscode-thunder-client",
+      // Blockchain & Web3
+      "juanblanco.solidity",
       // Productivity
       "wayou.vscode-todo-highlight",
       "gruntfuggly.todo-tree",
@@ -132,8 +159,16 @@
         "program": "${file}",
         "console": "integratedTerminal",
         "justMyCode": true
-      }
-    ],
+      },
+      {
+        "name": "Goldsky CLI: Serve",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "${workspaceFolder:Root}/node_modules/.bin/goldsky",
+        "args": ["serve"],
+        "cwd": "${workspaceFolder:Root}",
+        "console": "integratedTerminal"
+    }],
     "compounds": [
       {
         "name": "Run Full Stack",
@@ -141,6 +176,41 @@
           "Python: FastAPI",
           "Attach to .NET Functions"
         ]
+      }
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Goldsky: Initialize Project",
+        "type": "shell",
+        "command": "goldsky init",
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        }
+      },
+      {
+        "label": "Goldsky: Deploy",
+        "type": "shell",
+        "command": "goldsky deploy",
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        }
+      },
+      {
+        "label": "Goldsky: Serve",
+        "type": "shell",
+        "command": "goldsky serve",
+        "problemMatcher": [],
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        }
       }
     ]
   }
