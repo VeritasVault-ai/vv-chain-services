@@ -1,0 +1,384 @@
+{
+  "info": {
+    "_postman_id": "b5e7b5e7-b5e7-b5e7-b5e7-b5e7b5e7b5e7",
+    "name": "Wallet Integration Tests",
+    "description": "A collection of tests for the MetaMask wallet integration via Plurality",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Wallet Connection",
+      "item": [
+        {
+          "name": "Connect Wallet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"walletAddress\": \"0x742d35Cc6634C0532925a3b844Bc454e4438f44e\",\n    \"walletType\": \"MetaMask\",\n    \"chainId\": \"1\",\n    \"signature\": \"0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1b\",\n    \"message\": \"Connect wallet 0x742d35Cc6634C0532925a3b844Bc454e4438f44e to VeritasVault.ai\\nNonce: 123456789\\nTimestamp: 1621234567\",\n    \"timestampUnix\": 1621234567\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/connect",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "connect"
+              ]
+            },
+            "description": "Connect a MetaMask wallet through Plurality"
+          },
+          "response": []
+        },
+        {
+          "name": "Disconnect Wallet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"connectionId\": \"{{connectionId}}\",\n    \"walletAddress\": \"0x742d35Cc6634C0532925a3b844Bc454e4438f44e\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/disconnect",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "disconnect"
+              ]
+            },
+            "description": "Disconnect a wallet"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Wallet Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/status?connectionId={{connectionId}}&walletAddress=0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "connectionId",
+                  "value": "{{connectionId}}"
+                },
+                {
+                  "key": "walletAddress",
+                  "value": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+                }
+              ]
+            },
+            "description": "Get the status of a wallet connection"
+          },
+          "response": []
+        }
+      ],
+      "description": "Tests for wallet connection functionality"
+    },
+    {
+      "name": "Wallet Transactions",
+      "item": [
+        {
+          "name": "Deposit Tokens",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"connectionId\": \"{{connectionId}}\",\n    \"walletAddress\": \"0x742d35Cc6634C0532925a3b844Bc454e4438f44e\",\n    \"transactionType\": \"Deposit\",\n    \"transactionData\": \"{\\\"tokenAddress\\\":\\\"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48\\\",\\\"amount\\\":\\\"100.0\\\",\\\"recipient\\\":\\\"0x1234567890123456789012345678901234567890\\\"}\",\n    \"chainId\": \"1\",\n    \"timestampUnix\": 1621234567\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/transaction",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "transaction"
+              ]
+            },
+            "description": "Deposit tokens into the vault"
+          },
+          "response": []
+        },
+        {
+          "name": "Withdraw Assets",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"connectionId\": \"{{connectionId}}\",\n    \"walletAddress\": \"0x742d35Cc6634C0532925a3b844Bc454e4438f44e\",\n    \"transactionType\": \"Withdraw\",\n    \"transactionData\": \"{\\\"tokenAddress\\\":\\\"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48\\\",\\\"amount\\\":\\\"50.0\\\",\\\"recipient\\\":\\\"0x742d35Cc6634C0532925a3b844Bc454e4438f44e\\\"}\",\n    \"chainId\": \"1\",\n    \"timestampUnix\": 1621234567\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/transaction",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "transaction"
+              ]
+            },
+            "description": "Withdraw assets from the vault"
+          },
+          "response": []
+        },
+        {
+          "name": "Governance Vote",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"connectionId\": \"{{connectionId}}\",\n    \"walletAddress\": \"0x742d35Cc6634C0532925a3b844Bc454e4438f44e\",\n    \"transactionType\": \"GovernanceVote\",\n    \"transactionData\": \"{\\\"proposalId\\\":\\\"1\\\",\\\"vote\\\":\\\"For\\\",\\\"reason\\\":\\\"I support this proposal\\\"}\",\n    \"chainId\": \"1\",\n    \"timestampUnix\": 1621234567\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/transaction",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "transaction"
+              ]
+            },
+            "description": "Cast a governance vote"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Wallet Balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/balance?walletAddress=0x742d35Cc6634C0532925a3b844Bc454e4438f44e&chainId=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "balance"
+              ],
+              "query": [
+                {
+                  "key": "walletAddress",
+                  "value": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+                },
+                {
+                  "key": "chainId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Get the balance of a wallet"
+          },
+          "response": []
+        }
+      ],
+      "description": "Tests for wallet transaction functionality"
+    },
+    {
+      "name": "Verification",
+      "item": [
+        {
+          "name": "Verification Callback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"verificationId\": \"{{connectionId}}\",\n    \"walletAddress\": \"0x742d35Cc6634C0532925a3b844Bc454e4438f44e\",\n    \"status\": \"Verified\",\n    \"timestampUnix\": 1621234567,\n    \"metadata\": {\n        \"level\": \"standard\",\n        \"provider\": \"Plurality\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/verification-callback",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "verification-callback"
+              ]
+            },
+            "description": "Handle verification callbacks from Plurality"
+          },
+          "response": []
+        }
+      ],
+      "description": "Tests for verification functionality"
+    },
+    {
+      "name": "Error Handling",
+      "item": [
+        {
+          "name": "Connect Wallet - Invalid Signature",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"walletAddress\": \"0x742d35Cc6634C0532925a3b844Bc454e4438f44e\",\n    \"walletType\": \"MetaMask\",\n    \"chainId\": \"1\",\n    \"signature\": \"0xInvalidSignature\",\n    \"message\": \"Connect wallet 0x742d35Cc6634C0532925a3b844Bc454e4438f44e to VeritasVault.ai\\nNonce: 123456789\\nTimestamp: 1621234567\",\n    \"timestampUnix\": 1621234567\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/connect",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "connect"
+              ]
+            },
+            "description": "Test error handling for invalid signature"
+          },
+          "response": []
+        },
+        {
+          "name": "Connect Wallet - Missing Parameters",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"walletType\": \"MetaMask\",\n    \"chainId\": \"1\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/connect",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "connect"
+              ]
+            },
+            "description": "Test error handling for missing parameters"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Wallet Status - Missing Parameters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/wallet/status?connectionId={{connectionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallet",
+                "status"
+              ],
+              "query": [
+                {
+                  "key": "connectionId",
+                  "value": "{{connectionId}}"
+                }
+              ]
+            },
+            "description": "Test error handling for missing parameters"
+          },
+          "response": []
+        }
+      ],
+      "description": "Tests for error handling"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:7071",
+      "type": "string"
+    },
+    {
+      "key": "connectionId",
+      "value": "test-connection-id",
+      "type": "string"
+    }
+  ]
+}
+
