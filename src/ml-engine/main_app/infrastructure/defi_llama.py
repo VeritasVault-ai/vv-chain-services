@@ -1,8 +1,9 @@
-import requests
-import pandas as pd
 from dataclasses import dataclass, field
-from typing import List, Optional, Dict
 from datetime import date, datetime
+from typing import List, Optional, Dict
+
+import pandas as pd
+import requests
 
 
 @dataclass
@@ -141,27 +142,28 @@ def get_historical_prices(coins: list[str], start_date: date, end_date: date) ->
 
     # Build UNIX timestamps at midnight UTC
     start_ts = int(datetime.combine(start_date, datetime.min.time()).timestamp())
-    end_ts   = int(datetime.combine(end_date,   datetime.min.time()).timestamp())
+    # end_ts   = int(datetime.combine(end_date,   datetime.min.time()).timestamp())
 
     # Inclusive span in days
     span_days = (end_date - start_date).days + 1
 
     for coin in coins:
-        resp = requests.get(f"{base_url}{coin}")
+        request = f"{base_url}{coin}?start={start_ts}&period=1d&span={span_days}"
+        # request = f"{base_url}{coin}?start={start_ts}&end={end_ts}&span={span_days}&period=1d"
+        resp = requests.get(request)
         if resp.status_code != 200:
-            print(f"Error fetching {coin}: {resp.status_code}")
+            print(f"Error fetching {coin}: {resp.status_code} - {resp.text}")
             continue
 
         prices = resp.json().get("coins", {}).get(coin, {}).get("prices", [])
         # Filter milliseconds‐timestamps to [start_ts, end_ts]
         filtered = [
-            {"date": ts_ms, "price": price}
-            for ts_ms, price in prices
-            if start_ts <= ts_ms // 1000 <= end_ts
+            {"date": pd.to_datetime(entry['timestamp'], unit='s', utc=True), "price": entry['price']}
+            for entry in prices
         ]
 
         # Convert to DataFrame and limit to one entry per day, up to span_days
-        result[coin] = pd.DataFrame(filtered[:span_days])
+        result[coin] = pd.DataFrame(filtered)
 
     return result
 

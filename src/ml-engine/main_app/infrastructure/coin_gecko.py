@@ -18,11 +18,12 @@ def get_contract_addresses(symbol_chain_map: Dict[str, str], timeout: int = 10, 
 
     def safe_request(url: str, retries: int, timeout: int):
         for attempt in range(retries):
+            retry_seconds = 2 ** attempt + 9
             try:
                 response = requests.get(url, timeout=timeout)
 
                 if response.status_code == 429:
-                    retry_after = int(response.headers.get("Retry-After", 2 ** attempt + 10))
+                    retry_after = int(response.headers.get("Retry-After", retry_seconds))
                     print(f"Rate limited. Waiting {retry_after} seconds before retrying...")
                     time.sleep(retry_after)
                     continue
@@ -31,14 +32,14 @@ def get_contract_addresses(symbol_chain_map: Dict[str, str], timeout: int = 10, 
                 return response
 
             except requests.Timeout:
-                wait = 3 ** attempt
+                wait = retry_seconds
                 print(f"Timeout on {url}. Retrying in {wait} seconds...")
                 time.sleep(wait)
 
             except requests.RequestException as e:
                 if response := getattr(e, "response", None):
                     if response.status_code == 429:
-                        retry_after = int(response.headers.get("Retry-After", 2 ** attempt))
+                        retry_after = int(response.headers.get("Retry-After", retry_seconds))
                         print(f"Rate limited. Waiting {retry_after} seconds before retrying...")
                         time.sleep(retry_after)
                         continue
@@ -63,7 +64,7 @@ def get_contract_addresses(symbol_chain_map: Dict[str, str], timeout: int = 10, 
                     break
 
             if not coin_id:
-                contract_addresses[symbol] = "Symbol not found"
+                contract_addresses[symbol] = "Error: Symbol not found"
                 continue
 
             # Step 3: Get platform contract info
@@ -76,14 +77,14 @@ def get_contract_addresses(symbol_chain_map: Dict[str, str], timeout: int = 10, 
                 contract_addresses[symbol] = f"{chain}:{address}"
                 print(f"{symbol.upper()}: {chain}:{address}")
             else:
-                contract_addresses[symbol] = f"No contract on {chain}"
+                contract_addresses[symbol] = f"Error: No contract on {chain}"
 
         except requests.Timeout:
-            contract_addresses[symbol] = "Timeout after retries"
+            contract_addresses[symbol] = "Error: Timeout after retries"
         except requests.RequestException as e:
-            contract_addresses[symbol] = f"Request error: {str(e)}"
+            contract_addresses[symbol] = f"Error: Request error: {str(e)}"
         except Exception as e:
-            contract_addresses[symbol] = f"Unexpected error: {str(e)}"
+            contract_addresses[symbol] = f"Error: Unexpected error: {str(e)}"
 
     return contract_addresses
 
