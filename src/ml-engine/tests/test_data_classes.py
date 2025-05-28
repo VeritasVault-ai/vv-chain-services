@@ -10,34 +10,8 @@ def sample_json():
     Returns:
         A multi-line JSON string containing model details, risk-free rates, and crypto market data.
     """
-    return """
-    {
-      "Model": "BlackLitterman",
-      "ModelParameters": {},
-      "RiskFreeRates": [
-        {
-          "term": "1D",
-          "rate": 0.0175
-        }
-      ],
-      "CryptoMarketData": [
-        {
-          "Pool": "STETH",
-          "Project": "Lido",
-          "Chain": "Ethereum",
-          "Metrics": [
-            {
-              "Date": "2025-05-03T15:30:00.123Z",
-              "TVL": 123,
-              "APY": 0.0523,
-              "Base APY": 0.05,
-              "Reward APY": 0.0023
-            }
-          ]
-        }
-      ]
-    }
-    """
+    with open(os.path.join(os.path.dirname(__file__), "test_data/black_litterman_explicit_view_test_data.json"), "r") as file:
+        return file.read()
 
 
 @pytest.mark.parametrize(

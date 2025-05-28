@@ -3,7 +3,7 @@ from starlette.routing import Route
 from starlette.responses import JSONResponse
 from starlette.endpoints import HTTPEndpoint
 from jsonschema import validate, ValidationError
-from main_app.models.BlackLittermanYieldModel import BlackLittermanYieldModel
+from main_app.models.black_litterman.BlPortfolioModel import BlPortfolioModel
 from main_app.data_classes.BlackLittermanModelData import BlackLittermanModelData
 from infrastructure.defi_llama import get_historic_tvl_and_apy_from_symbol
 import json
@@ -36,7 +36,7 @@ class ModelEndpoint(HTTPEndpoint):
         # Build model and calculate
         json_payload = json.dumps(payload)
         model_data = BlackLittermanModelData.from_json(json_payload)
-        model = BlackLittermanYieldModel(model_data=model_data)
+        model = BlPortfolioModel(model_data=model_data)
         result = model.calculate()
 
         return result
