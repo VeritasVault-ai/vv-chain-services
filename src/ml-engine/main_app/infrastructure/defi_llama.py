@@ -14,6 +14,41 @@ class PoolPredictions:
 
 
 @dataclass
+class ProtocolData:
+    id: str
+    name: str
+    address: Optional[str]
+    symbol: Optional[str]
+    url: Optional[str]
+    description: Optional[str]
+    chain: str
+    logo: Optional[str]
+    audits: Optional[str]
+    audit_note: Optional[str]
+    gecko_id: Optional[str]
+    cmcId: Optional[str]
+    category: str
+    chains: List[str]
+    module: str
+    twitter: Optional[str]
+    forkedFromIds: List[str]
+    oracles: List[str]
+    audit_links: List[str]
+    listedAt: Optional[int]
+    hallmarks: List[List]
+    methodology: Optional[str]
+    slug: str
+    tvl: float
+    chainTvls: Dict
+    change_1h: Optional[float]
+    change_1d: Optional[float]
+    change_7d: Optional[float]
+    tokenBreakdowns: Dict
+    mcap: Optional[float]
+    staking: float
+
+
+@dataclass
 class PoolData:
     chain: str
     exposure: str
@@ -41,6 +76,10 @@ class PoolData:
     volumeUsd1d: Optional[float]
     volumeUsd7d: Optional[float]
     sigma: Optional[float]
+    protocolName: Optional[str] = None
+    protocolDescription: Optional[str]  = None
+    protocolCategory: Optional[str]  = None
+    protocolData: Optional[ProtocolData] = None
     underlyingTokens: List[str] = field(default_factory=list)
     rewardTokens: List[str] = field(default_factory=list)
 
@@ -122,6 +161,52 @@ def get_historic_tvl_and_apy_from_pool_id(pool_id) -> pd.DataFrame:
         return df
     else:
         raise Exception(f"Failed to get historic TVL and APY for {pool_id}: {response.status_code} - {response.text}")
+
+
+def get_protocol_data() -> List[ProtocolData]:
+    url = "https://api.llama.fi/protocols"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        protocols = []
+        for protocol in data:
+            protocol_data = ProtocolData(
+                id=protocol.get('id'),
+                name=protocol.get('name'),
+                address=protocol.get('address'),
+                symbol=protocol.get('symbol'),
+                url=protocol.get('url'),
+                description=protocol.get('description'),
+                chain=protocol.get('chain'),
+                logo=protocol.get('logo'),
+                audits=protocol.get('audits'),
+                audit_note=protocol.get('audit_note'),
+                gecko_id=protocol.get('gecko_id'),
+                cmcId=protocol.get('cmcId'),
+                category=protocol.get('category'),
+                chains=protocol.get('chains', []),
+                module=protocol.get('module'),
+                twitter=protocol.get('twitter'),
+                forkedFromIds=protocol.get('forkedFromIds', []),
+                oracles=protocol.get('oracles', []),
+                audit_links=protocol.get('audit_links', []),
+                listedAt=protocol.get('listedAt'),
+                hallmarks=protocol.get('hallmarks', []),
+                methodology=protocol.get('methodology'),
+                slug=protocol.get('slug'),
+                tvl=protocol.get('tvl'),
+                chainTvls=protocol.get('chainTvls', {}),
+                change_1h=protocol.get('change_1h'),
+                change_1d=protocol.get('change_1d'),
+                change_7d=protocol.get('change_7d'),
+                tokenBreakdowns=protocol.get('tokenBreakdowns', {}),
+                mcap=protocol.get('mcap'),
+                staking=protocol.get('staking', 0)
+            )
+            protocols.append(protocol_data)
+        return protocols
+    else:
+        raise Exception(f"Failed to get protocol data: {response.status_code} - {response.text}")
 
 
 def get_historical_prices(coins: list[str], start_date: date, end_date: date) -> dict[str, pd.DataFrame]:
